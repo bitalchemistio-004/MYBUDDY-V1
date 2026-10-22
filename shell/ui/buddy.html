@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="clay">
+<head>
+<meta charset="utf-8">
+<title>MBUDDY buddy</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/buddy-sprite.css">
+<link rel="stylesheet" href="css/notch.css">
+<link rel="stylesheet" href="css/wardrobe.css">
+</head>
+<body class="corner right medium asleep">
+<!-- The notch (popup style "notch"): a self-drawn pill that hangs from the top edge, minimal while idle, a
+     small strip with what is happening when something is, and the character's room when opened. In the other
+     styles this is hidden and the character and its bubbles below stand alone, as before. -->
+<div class="notch" id="notch" data-n="rest" hidden>
+  <div class="nglow" id="nglow" aria-hidden="true"></div>
+  <i class="nflare l" aria-hidden="true"></i><i class="nflare r" aria-hidden="true"></i>
+  <div class="shell" id="shell"><div class="inner" id="ninner">
+    <div class="nplate" id="nplate" aria-hidden="true"><i class="nfloor"></i><i class="nledge"></i></div>
+    <div class="nbar" id="nbar">
+      <div class="scene" id="scene"></div>
+      <div class="nline" id="nline"><span class="ndot" aria-hidden="true"></span><b id="nword">Ready</b><span class="nmeta" id="nmeta"></span><span class="npins" id="npins" aria-hidden="true"></span></div>
+      <div class="nside" id="nside"></div>
+      <div class="nchips" id="props" aria-hidden="true"></div>
+      <button class="nclose" id="nclose" type="button" aria-label="Close" title="Close" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="nroom" id="nroom" hidden></div>
+  </div></div>
+</div>
+<!-- The character, alone: no container around it. What it says and what it
+     is working on extend out beside it and retract again. -->
+<div class="stage" id="stage" title="Open MBUDDY"></div>
+<div class="side" id="side">
+  <div class="talk" id="bubble" hidden><small id="bubble-who">MBUDDY</small><span id="bubble-text"></span></div>
+  <div class="act" id="act" role="group" aria-live="polite" hidden><small id="act-who"></small><p id="act-text"></p><div class="acts" id="act-buttons"></div></div>
+  <div class="bub" id="bub" aria-live="polite" title="Open MBUDDY" hidden></div>
+  <div class="cap" id="cap" aria-hidden="true" hidden>
+    <span class="bars"><i></i><i></i><i></i><i></i><i></i></span><span class="dots"><i></i><i></i><i></i></span>
+  </div>
+</div>
+<script type="module" src="js/buddy.js"></script>
+</body>
+</html>

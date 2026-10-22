@@ -1,0 +1,22 @@
+# One line ending in the repository (LF), whatever machine edits it, so diffs show real changes only.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.mp4 binary
+*.wav binary
+*.ico binary
+*.jar binary
+*.keystore binary
+*.jks binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.apk binary
+*.gguf binary
+*.litertlm binary

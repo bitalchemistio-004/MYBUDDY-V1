@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_description">Lets MBUDDY, your desk buddy, see the screen and tap and type in other apps, only while a task you gave it is running, so it can do things like write a message for you. It always reads back what it wrote and waits for your yes before sending, paying, deleting, posting or calling, and you can stop it at any time. It does not run by itself, and it never operates banking, payment or password apps. If you turn it on in MBUDDY, it also notices both volume keys pressed together, to call the buddy, and reads the keys for nothing else.</string>
+    <string name="widget_description">What is next on your day, from your tasks and events. Tap to open MBUDDY.</string>
+    <string name="widget_tasks_description">Your open tasks, with a tick you can tap right here.</string>
+    <string name="widget_ask_description">Tap to talk to your buddy without opening the app.</string>
+    <string name="widget_play_description">Your level, your streak, and a button to play.</string>
+    <string name="widget_today_description">Today as a list: what is on and when.</string>
+    <string name="widget_focus_description">Start a focus sprint from the home screen.</string>
+    <string name="sc_ask">Ask</string>
+    <string name="sc_ask_long">Ask MBUDDY</string>
+    <string name="sc_add">Add task</string>
+    <string name="sc_add_long">Add a task</string>
+    <string name="sc_today">Today</string>
+    <string name="sc_today_long">Open Today</string>
+    <string name="sc_play">Play</string>
+    <string name="sc_play_long">Play a game</string>
+</resources>

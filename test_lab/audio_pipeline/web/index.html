@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBUDDY Audio Lab</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Audio Pipeline Lab</h1>
+    <p class="sub">Microphones → firmware → PCM chunks → server → speech-to-text — <a href="/benches">more test benches →</a></p>
+  </div>
+  <div class="badges">
+    <span class="badge" id="badge-server" data-state="bad">server: connecting…</span>
+    <span class="badge" id="badge-device" data-state="bad">device: not connected</span>
+    <span class="badge" id="badge-stt" data-state="idle">STT: —</span>
+  </div>
+</header>
+
+<div id="banner" class="banner" hidden></div>
+
+<main class="grid">
+
+  <!-- 1. Microphone selection -->
+  <section class="card" id="card-mic">
+    <h2>1 · Microphone under test</h2>
+    <div class="mic-choices" role="radiogroup" aria-label="Microphone">
+      <button class="mic-choice" data-mic="left"  role="radio"><span class="mic-name">Left</span><span class="mic-hint">slot 0 · L/R pin → GND</span><span class="pill" data-role="confirm"></span></button>
+      <button class="mic-choice" data-mic="right" role="radio"><span class="mic-name">Right</span><span class="mic-hint">slot 1 · L/R pin → 3.3 V</span><span class="pill" data-role="confirm"></span></button>
+      <button class="mic-choice" data-mic="both"  role="radio"><span class="mic-name">Both</span><span class="mic-hint">stereo · needed for direction</span><span class="pill" data-role="confirm"></span></button>
+    </div>
+    <div class="row">
+      <label class="check"><input type="checkbox" id="swap"> Swap left / right</label>
+      <label class="field">Digital gain
+        <input type="number" id="gain" min="1" max="32" step="0.5" value="12"> ×
+      </label>
+      <button class="btn small" id="apply-gain">Apply</button>
+    </div>
+    <p class="raw-slots" id="raw-slots">Raw I2S slots (measured on the device, before swap / gain / filtering): waiting for device…</p>
+    <p class="raw-slots" id="bit-health">Raw bit health: waiting for device…</p>
+    <p class="note">Tap or speak into one microphone: if the <em>other</em> bar moves, tick “Swap left / right”. The firmware applies the swap itself, before packets are built. Production uses 12× gain.</p>
+  </section>
+
+  <!-- 2. Levels -->
+  <section class="card" id="card-levels">
+    <h2>2 · Volume heard</h2>
+    <div class="meters">
+      <div class="meter" data-ch="left">
+        <div class="meter-head"><span>Left mic</span><span class="db" data-role="db">—</span></div>
+        <div class="bar"><div class="fill"></div><div class="peak"></div></div>
+      </div>
+      <div class="meter" data-ch="right">
+        <div class="meter-head"><span>Right mic</span><span class="db" data-role="db">—</span></div>
+        <div class="bar"><div class="fill"></div><div class="peak"></div></div>
+      </div>
+      <div class="meter" data-ch="both">
+        <div class="meter-head"><span>Both (mix)</span><span class="db" data-role="db">—</span></div>
+        <div class="bar"><div class="fill"></div><div class="peak"></div></div>
+      </div>
+    </div>
+    <div class="scale"><span>−80</span><span>−60</span><span>−40</span><span>−20</span><span>0 dBFS</span></div>
+    <div class="listen" id="listen">
+      <div class="row">
+        <button class="btn" id="listen-btn" aria-pressed="false">🎧 Listen live</button>
+        <label class="field">Volume <input type="range" id="listen-vol" min="0" max="100" value="50" aria-label="Listening volume"></label>
+        <label class="field">Delay
+          <select id="listen-buf" aria-label="Listening buffer">
+            <option value="0.08">low (~80 ms)</option>
+            <option value="0.15" selected>normal (~150 ms)</option>
+            <option value="0.3">safe (~300 ms)</option>
+          </select>
+        </label>
+      </div>
+      <div class="bar listen-bar" aria-hidden="true"><div class="fill" id="listen-fill"></div></div>
+      <p class="listen-stats" id="listen-stats" aria-live="polite">Not listening.</p>
+      <p class="note">Plays what the server is receiving, after the section 3 gain and noise gate, so you hear exactly what the meters, recordings and speech-to-text get. <b>Use headphones:</b> speakers near the robot are picked up by its microphones and will squeal. With “Both” selected the left mic plays in your left ear and the right mic in your right.</p>
+    </div>
+    <p class="note">RMS over the last 100 ms of the audio that arrived from the device (after the channel-balance gain in section 3); the tick is the recent peak. A bar is greyed when its microphone is not being transmitted.</p>
+  </section>
+
+  <!-- 3. Channel balance calibration -->
+  <section class="card wide" id="card-cal">
+    <h2>3 · Channel balance (gain + noise-floor calibration)</h2>
+    <div class="cal">
+      <div>
+        <ol class="cal-steps">
+          <li>Select <b>Both</b> in section 1.</li>
+          <li>Put a steady sound source <b>centred in front</b>, equally far from both mics (about 30 cm): talk continuously, or play music / noise.</li>
+          <li>Press <b>Calibrate</b>. Stay <b>silent</b> until the page says <b>MAKE SOUND</b>, then keep the sound steady until it finishes.</li>
+        </ol>
+        <div class="row">
+          <button class="btn" id="cal-run">Calibrate (measure &amp; apply)</button>
+          <button class="btn ghost" id="cal-verify">Verify only</button>
+          <button class="btn ghost" id="cal-cancel" hidden>Cancel</button>
+        </div>
+        <div class="cal-status" id="cal-status" aria-live="polite">Idle.</div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="gate-on" checked> Match noise floors at rest (gate on the boosted channel)</label>
+        </div>
+        <div class="row">
+          <label class="field">Left gain / boost <input type="number" id="trim-left" min="-20" max="40" step="0.1" value="0"> dB</label>
+          <label class="field">Right gain / boost <input type="number" id="trim-right" min="-20" max="40" step="0.1" value="0"> dB</label>
+          <button class="btn small" id="trim-apply">Set manually</button>
+          <button class="btn small ghost" id="trim-reset">Reset to 0</button>
+        </div>
+        <p class="cal-msg" id="trim-msg" aria-live="polite"></p>
+        <p class="note">Gain / boost (also called trim) is extra gain added to that one channel, on top of the firmware's digital gain in section 1. Positive boosts the channel, negative cuts it, 0 leaves it untouched. The calibration sets it for you; use these boxes to fine-tune by hand.</p>
+      </div>
+      <div>
+        <p class="cal-active" id="cal-active">Active settings: —</p>
+        <table class="triple" id="cal-result"></table>
+        <ul class="cal-warnings" id="cal-warnings"></ul>
+      </div>
+    </div>
+    <p class="note">Two things are balanced so the meters agree both <b>during sound</b> and <b>at rest</b>. The gain (boost) on the weaker mic matches the signal level. Because that also boosts its noise, a gate then pulls the boosted channel's noise back to the other channel's noise floor whenever nothing is playing; it opens when the mic's own level rises clearly above its own noise. The tables show what the meters read in both situations, measured by running the captured audio through the same processing the live path uses. Neither step improves that mic's signal-to-noise ratio: a very weak mic's output is mostly noise, and the page warns when that is the case. Calibrate again after re-wiring or replacing a mic. Settings are saved and re-applied on restart; the meters, direction, recordings and STT use the processed audio, while the raw I2S readout in section 1 stays untouched. The raw audio of the last calibration run is kept in <code>calibration_last_run.wav</code>.</p>
+  </section>
+
+  <!-- 4. Spatial diagram -->
+  <section class="card wide" id="card-space">
+    <h2>4 · Sound direction</h2>
+    <div class="space">
+      <svg id="radar" viewBox="0 0 400 250" role="img" aria-label="Sound direction as seen from above the robot"></svg>
+      <div class="space-side">
+        <dl class="readout">
+          <dt>Bearing (time difference)</dt><dd id="r-angle">—</dd>
+          <dt>Inter-mic lag</dt><dd id="r-lag">—</dd>
+          <dt>Correlation</dt><dd id="r-corr">—</dd>
+          <dt>Level balance R − L</dt><dd id="r-ild">—</dd>
+        </dl>
+        <label class="field">Mic spacing
+          <input type="number" id="spacing" min="1" max="50" step="0.5" value="10"> cm
+        </label>
+        <button class="btn small" id="set-centre">Set current sound as “straight ahead”</button>
+        <button class="btn small ghost" id="clear-centre">Clear centre</button>
+      </div>
+    </div>
+    <div class="balance" aria-label="Level balance">
+      <span>L louder</span><div class="balance-track"><div class="balance-mid"></div><div class="balance-dot" id="balance-dot"></div></div><span>R louder</span>
+    </div>
+    <p class="note">Top-down view, robot at the bottom facing up. The needle is the <b>time-difference</b> bearing: sound reaches the nearer mic first, and the lag between the channels gives the angle from the mic spacing. Two mics cannot tell front from back. The balance bar shows the raw <b>level difference</b> only — turning it into degrees needs a calibration for this mic pair. Nothing is drawn when the room is too quiet or only one mic is transmitting. Enter your real mic spacing; the default is a guess.</p>
+  </section>
+
+  <!-- 4. Chunk size -->
+  <section class="card wide" id="card-chunk">
+    <h2>5 · PCM chunk size</h2>
+    <div class="chunk">
+    <div>
+    <p class="note first">Samples per channel in each packet the firmware sends. Production uses 256.</p>
+    <div class="presets" id="chunk-presets"></div>
+    <div class="row">
+      <label class="field">Custom
+        <input type="number" id="chunk-custom" min="32" max="1024" step="32" value="256">
+      </label>
+      <button class="btn" id="chunk-apply">Apply to firmware</button>
+    </div>
+    </div>
+    <table class="triple">
+      <tr><th>Requested (web)</th><td id="c-req">—</td></tr>
+      <tr><th>Confirmed by device (ACK)</th><td id="c-ack">—</td></tr>
+      <tr><th>Measured in packet headers</th><td id="c-wire">—</td></tr>
+      <tr><th>Packet size / interval</th><td id="c-size">—</td></tr>
+      <tr><th>Rate</th><td id="c-rate">—</td></tr>
+      <tr><th>Lost packets (seq gaps)</th><td id="c-drop">—</td></tr>
+    </table>
+    </div>
+    <p class="note">Only the “measured” row proves the hardware changed: it is read from the packets that arrived, not from what was requested.</p>
+  </section>
+
+  <!-- 5. Recording, playback, STT -->
+  <section class="card wide" id="card-rec">
+    <h2>6 · Record, play back, transcribe</h2>
+    <div class="row">
+      <button class="btn rec" id="rec-btn" disabled>● Record</button>
+      <span class="timer" id="rec-timer">0.0 s</span>
+      <span class="note inline" id="rec-hint">Records the selected microphone(s) as a 16 kHz 16-bit WAV, with the section 3 gain applied.</span>
+    </div>
+    <div id="rec-list" class="rec-list"><p class="empty">No recordings yet.</p></div>
+    <p class="note">Transcription runs the recording through the production STT stage (DSP → silence trim → Groq Whisper). Live-only stages — VAD, hallucination filters, language policy — are not part of this branch. The first request after starting the server may wait while the STT stack loads.</p>
+  </section>
+
+  <!-- 7. Wiring diagnostic -->
+  <section class="card wide" id="card-diag">
+    <h2>7 · Wiring diagnostic (raw I2S bits)</h2>
+    <p class="note first">Looks at the microphones' raw 32-bit data words, before any gain or filtering, to tell a <b>word-select (WS) / clock (SCK) / data (SD)</b> problem from an ordinary noisy or weak microphone. Capture in a <b>quiet room</b>. A healthy INMP441 sends 24 data bits at the top of each 32-bit word and leaves the lowest bits at 0; lost sync shows up as full-scale-looking garbage or as bits shifted into those idle low bits. It also looks for a glitch that repeats every I2S buffer, which points at electrical coupling from the ESP32 itself.</p>
+    <div class="row">
+      <button class="btn" id="diag-btn">Capture raw I2S words (0.25 s)</button>
+      <button class="btn ghost" id="diag-quiet-btn" title="Stops sending audio over Wi-Fi during the capture">Capture with Wi-Fi audio paused</button>
+      <span class="listen-stats" id="diag-status" aria-live="polite">Idle.</span>
+    </div>
+    <table class="diag-table" id="diag-table"></table>
+    <table class="diag-table" id="diag-compare"></table>
+    <ul class="diag-verdicts" id="diag-verdicts"></ul>
+    <p class="note"><b>Wi-Fi test:</b> take one normal capture and one with Wi-Fi audio paused. If the repeating glitch is there normally and gone when Wi-Fi is paused, the ESP32's Wi-Fi transmissions are coupling into that microphone (power or ground). These are fingerprints, not proof. They say what the bits are consistent with; the physical checks (continuity of the WS wire, resolder, swap the wire sets) settle it. Needs the mic_lab firmware version 2 or newer. The raw capture is kept in <code>diag_last_capture.npy</code>.</p>
+  </section>
+
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

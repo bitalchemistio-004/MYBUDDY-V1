@@ -1,0 +1,26 @@
+<!doctype html>
+<!--
+  MBUDDY voice bridge: the laptop microphone and speakers, connected to the
+  backend as a "PC body" over the same /ws protocol the ESP32 uses.
+
+  Why a web page: on this laptop, raw Windows capture of the Intel mic array
+  is quiet and robotic, while Chromium's WebRTC capture (gain control, noise
+  suppression, echo cancellation) is clean (docs/audit/AUDIT_LOG.md 2.2).
+  The Tauri shell runs this page in a hidden WebView2 window; it also works
+  in Chrome for testing: http://127.0.0.1:<port>/listener.html
+
+  Query parameters: ?backend=ws://127.0.0.1:5000/ws&token=...&mic=Microphone%20Array
+  This page is a bridge, not the product UI (that waits for Phase 3).
+-->
+<html lang="en"><head><meta charset="utf-8"><title>MBUDDY voice bridge</title>
+<style>
+  body { font: 14px system-ui, sans-serif; margin: 16px; background: #1b1512; color: #f3e6d8; }
+  #state { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  #log { white-space: pre-wrap; font: 12px ui-monospace, monospace; max-height: 70vh; overflow: auto; }
+  button { font-size: 16px; padding: 8px 16px; }
+</style></head><body>
+<div id="state">Starting…</div>
+<button id="start" hidden>Start microphone</button>
+<div id="log"></div>
+<script src="listener.js"></script>
+</body></html>

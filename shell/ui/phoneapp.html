@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- MBUDDY on the phone, as an app of its own, in the Nocturne look: three places only (Buddy, Today, Settings), one way to ask, and
+     the details one tap deeper. Its own data on the phone and its own brain; the PC is optional (sync and its brain).
+     Loaded by the Android app from its bundled files. -->
+<html lang="en" data-theme="blink" data-look="nocturne">
+<head>
+<meta charset="utf-8">
+  <link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>MBUDDY</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/glass.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/cards.css">
+<link rel="stylesheet" href="css/nocturne.css">
+<link rel="stylesheet" href="css/phoneapp.css">
+<script>window.__MBUDDY_REMOTE__ = true;</script>
+</head>
+<body>
+<div class="pa">
+  <header class="pa-top">
+    <span class="pa-state" id="pa-state-wrap"><i class="pa-dot" aria-hidden="true"></i><span id="pa-state">Ready</span></span>
+    <button class="pa-me" id="pa-me" type="button" aria-label="Your buddy: tap for what you use most and games"><span class="pa-avatar" id="pa-avatar" aria-hidden="true"></span><span class="pa-say" id="pa-say"></span>
+      <svg class="pa-stampi" viewBox="0 0 26 26" aria-hidden="true"><path d="M5 14l5 5 11-12"/></svg><i class="pa-pbar" id="pa-pbar" aria-hidden="true"></i></button><span class="sr" id="pa-name">Blink</span>
+    <span class="pa-tools"><button class="pa-gear" id="pa-search" type="button" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button><button class="pa-gear" id="pa-gear" type="button" aria-label="Settings"><svg class="pa-cog" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button></span>
+  </header>
+  <main class="pa-content" id="pa-content"></main>
+  <div class="pa-dock" id="pa-dock">
+    <form class="pa-ask" id="pa-ask" autocomplete="off">
+      <label for="pa-in" class="sr">Ask or tell MBUDDY</label>
+      <input id="pa-in" placeholder="Ask me anything" maxlength="1000" enterkeyhint="send">
+      <button class="pa-icon" id="pa-mic" type="button" aria-label="Talk to me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <button class="pa-icon go" id="pa-send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+    </form>
+    <nav class="pa-nav" id="pa-nav" aria-label="Sections"><i class="pa-nav-mark" id="pa-nav-mark" aria-hidden="true"></i></nav>
+  </div>
+</div>
+<div class="pa-sheet" id="pa-sheet" hidden><div class="pa-sheet-back" data-close></div><div class="pa-sheet-body" role="dialog" aria-modal="true" id="pa-sheet-body"></div></div>
+<div class="pa-toast" id="toast" role="status" aria-live="polite"><span id="toast-text"></span><button type="button" id="toast-act" hidden></button></div>
+<script src="js/native-shim.js"></script>
+<script type="module" src="js/papp/app.js"></script>
+</body>
+</html>

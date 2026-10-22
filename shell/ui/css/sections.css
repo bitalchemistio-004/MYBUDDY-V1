@@ -1,0 +1,118 @@
+/* Today, What I learned, Focus and Calendar. Only the app's own tokens and
+   component classes; nothing here sets a colour of its own. */
+.sec .grid12 { display: grid; gap: var(--s4); grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: start; }
+.sec .grid12 > * { min-width: 0; }
+.sec .c4 { grid-column: span 4; } .sec .c5 { grid-column: span 5; } .sec .c6 { grid-column: span 6; } .sec .c7 { grid-column: span 7; }
+.sec .c8 { grid-column: span 8; } .sec .c12 { grid-column: span 12; }
+.sec { container-type: inline-size; }
+@container (max-width: 820px) { .sec .c4, .sec .c5, .sec .c6, .sec .c7, .sec .c8 { grid-column: span 12; } }
+.sec .card h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3);
+  display: flex; align-items: center; gap: var(--s2); }
+.sec .card h3 .chip { margin-left: auto; text-transform: none; letter-spacing: 0; }
+.sec .note { margin: 0; color: var(--text-3); font-size: var(--fs-small); }
+.sec .think { margin: 0; color: var(--text-2); font-size: var(--fs-small); }
+.sec .btnrow { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.sec .btnrow .btn { flex: 1; min-width: 96px; }
+.sec select.field { min-height: 36px; padding: 0 var(--s3); }
+.sec .stat b { font-family: var(--display); font-weight: 800; font-size: 20px; }
+
+/* Today: the focus ring */
+.sec .scorebox { display: flex; align-items: center; gap: var(--s5); flex-wrap: wrap; }
+.sec .ringwrap { position: relative; width: 116px; height: 116px; flex: none; }
+.sec .ringwrap svg { transform: rotate(-90deg); display: block; }
+.sec .ringwrap circle { fill: none; stroke-width: 10; stroke-linecap: round; }
+.sec .ringwrap .bg { stroke: var(--surface-3); }
+.sec .ringwrap .fg { stroke: var(--accent); stroke-dasharray: 314; transition: stroke-dashoffset 1s var(--ease); }
+.sec .ringwrap b { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 30px; font-variant-numeric: tabular-nums; }
+.sec .ringwrap b.dash { color: var(--text-3); }
+.sec .dots7 { display: flex; gap: 6px; }
+.sec .dots7 i { width: 22px; height: 22px; border-radius: 7px; background: var(--surface-3); }
+.sec .dots7 i.on { background: var(--accent); }
+
+/* Today: time by program */
+.sec .approw { display: grid; grid-template-columns: 28px minmax(90px, 150px) minmax(0, 1fr) 62px 118px; gap: var(--s3); align-items: center; padding: 6px 0; }
+.sec .approw + .approw { border-top: 1px solid var(--line); }
+.sec .approw .ic { width: 28px; height: 28px; border-radius: 8px; background: var(--surface-3); display: grid; place-items: center; font-weight: 800; font-size: 13px; overflow: hidden; }
+.sec .approw .ic img { width: 100%; height: 100%; object-fit: contain; }
+.sec .approw .nm { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sec .approw .bar { height: 10px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.sec .approw .bar i { display: block; height: 100%; border-radius: 6px; }
+.sec .approw em { font-style: normal; text-align: right; color: var(--text-2); font-variant-numeric: tabular-nums; font-size: var(--fs-small); }
+.sec .approw select { min-height: 30px; font-size: var(--fs-small); padding: 0 8px; }
+.sec .card { container-type: inline-size; }
+@container (max-width: 560px) { .sec .approw { grid-template-columns: 28px minmax(0, 1fr) 62px; } .sec .approw .bar, .sec .approw select { grid-column: 2 / -1; } }
+.sec .st-work { background: var(--accent); } .sec .st-off { background: var(--bad); } .sec .st-mixed { background: var(--text-3); }
+.sec .st-unknown { background: repeating-linear-gradient(45deg, var(--text-3) 0 4px, var(--surface-3) 4px 8px); }
+.sec .legend { display: flex; gap: var(--s4); flex-wrap: wrap; font-size: var(--fs-small); color: var(--text-2); }
+.sec .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+
+/* Today: the day as a strip */
+.sec .tl { position: relative; height: 34px; border-radius: 10px; background: var(--surface-2); overflow: hidden; }
+.sec .tl i { position: absolute; top: 0; bottom: 0; }
+.sec .tlh { position: relative; height: 16px; color: var(--text-3); font-size: 11px; font-variant-numeric: tabular-nums; }
+.sec .tlh span { position: absolute; transform: translateX(-50%); }
+
+/* Toggles and rows inside cards */
+.sec .ask-q { padding: var(--s3); border-radius: var(--radius-sm); background: var(--surface-2); display: grid; gap: var(--s3); }
+.sec .ask-q b { font-size: var(--fs-lead); }
+
+/* Focus */
+.sec .fhero { display: flex; align-items: center; gap: var(--s6); flex-wrap: wrap; }
+.sec .fring { position: relative; width: 220px; height: 220px; flex: none; }
+.sec .fring svg { transform: rotate(-90deg); display: block; }
+.sec .fring circle { fill: none; stroke-width: 12; stroke-linecap: round; }
+.sec .fring .bg { stroke: var(--surface-3); }
+.sec .fring .fg { stroke: var(--accent); stroke-dasharray: 565; transition: stroke-dashoffset 1s linear; }
+.sec .fring div { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; font-family: var(--display); font-weight: 800; font-size: 46px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.sec .fring small { display: block; font-size: 12px; font-weight: 700; line-height: 1.3; font-family: inherit; color: var(--text-3); letter-spacing: .06em; text-transform: uppercase; margin-top: 2px; }
+.sec .hist { display: flex; gap: 8px; align-items: flex-end; height: 100px; }
+.sec .hist div { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.sec .hist i { display: block; border-radius: 6px 6px 2px 2px; background: var(--accent); min-height: 4px; }
+.sec .hist i.zero { background: var(--surface-3); }
+.sec .histl { display: flex; gap: 8px; color: var(--text-3); font-size: 11px; }
+.sec .histl span { flex: 1; text-align: center; }
+
+/* What I learned */
+.sec .bars { display: grid; gap: var(--s2); }
+.sec .br { display: grid; grid-template-columns: 110px minmax(0, 1fr) 64px; gap: var(--s3); align-items: center; font-weight: 700; font-size: var(--fs-small); }
+.sec .br .track { height: 16px; background: var(--surface-2); border-radius: 6px; overflow: hidden; }
+.sec .br .track i { display: block; height: 100%; border-radius: 6px; background: var(--text-3); transition: width .8s var(--ease); }
+.sec .br.hi .track i { background: var(--accent); }
+.sec .br em { font-style: normal; text-align: right; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.sec .lrow { padding: var(--s3); border-radius: var(--radius-sm); background: var(--surface-2); display: grid; gap: 6px; }
+.sec .lrow + .lrow { margin-top: var(--s2); }
+.sec .lrow .top2 { display: flex; gap: var(--s3); align-items: flex-start; }
+.sec .lrow .top2 b { flex: 1; }
+.sec .lrow p { margin: 0; color: var(--text-2); font-size: var(--fs-small); overflow-wrap: anywhere; }
+.sec .metas { display: flex; gap: 6px; flex-wrap: wrap; }
+.sec .metas .chip { font-size: 11px; }
+.sec .ev { height: 6px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+.sec .ev i { display: block; height: 100%; background: var(--ok); }
+
+/* Calendar */
+.sec .monthnav { display: flex; align-items: center; gap: var(--s2); }
+.sec .monthnav b { font-family: var(--display); font-size: var(--fs-lead); min-width: 9.5em; }
+.sec .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.sec .cal .dow { text-align: center; color: var(--text-3); font-size: 11px; font-weight: 800; padding: 4px 0; }
+.sec .cal button.day { position: relative; min-height: 58px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--surface-2); color: var(--text); text-align: left; padding: 6px 8px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.sec .cal button.day:hover { background: var(--surface-3); }
+.sec .cal button.day.out { opacity: .42; }
+.sec .cal button.day.today { border-color: var(--accent); }
+.sec .cal button.day[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.sec .cal button.day .n { font-weight: 800; font-size: 13px; }
+.sec .cal button.day .dotrow { position: absolute; left: 8px; right: 8px; bottom: 6px; display: flex; gap: 3px; flex-wrap: wrap; }
+.sec .cal button.day .dotrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.sec .cal button.day .cnt { position: absolute; right: 8px; bottom: 5px; font-size: 10px; color: var(--accent-text); font-weight: 800; }
+@container (max-width: 560px) { .sec .cal button.day { min-height: 44px; padding: 4px; } }
+.sec .frm3 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: var(--s2); align-items: end; }
+.sec .frm3 label { display: grid; gap: 4px; min-width: 0; }
+@media (max-width: 820px) {.sec .frm3 { grid-template-columns: 1fr 1fr; } }
+.sec .clock { width: 88px; height: 88px; flex: none; }
+.sec .clock circle { fill: var(--surface-2); stroke: var(--text-3); stroke-width: 2; }
+.sec .clock line { stroke: var(--text); stroke-width: 3; stroke-linecap: round; transform-origin: 30px 30px; transition: transform 1s cubic-bezier(.3, 1.5, .5, 1); }
+.sec .clock #mh { stroke: var(--accent); stroke-width: 2; }
+.sec .clock .pin { fill: var(--accent); stroke: none; }
+.sec .clock .tk { stroke: var(--text-3); stroke-width: 1.5; }
+.sec .hitday { animation: hitday .6s cubic-bezier(.2, 1.8, .4, 1) both; }
+@keyframes hitday { 0% { transform: scale(.85); } 60% { transform: scale(1.08); } 100% { transform: none; } }
+[data-motion="reduced"] .sec .hitday { animation: none; }

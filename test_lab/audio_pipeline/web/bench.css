@@ -1,0 +1,32 @@
+.benchwrap { max-width: 1200px; margin: 0 auto; padding: 12px 20px 40px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.tab { background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px 8px 0 0; padding: 8px 14px; font: inherit; cursor: pointer; }
+.tab[aria-selected="true"] { border-color: var(--accent); border-bottom-color: var(--card); font-weight: 700; box-shadow: 0 2px 0 var(--card); }
+.bench-desc { color: var(--muted); font-size: 13.5px; margin: 0 0 12px; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 10px 0; }
+.controls .field input[type="text"] { width: 160px; }
+.checks { display: inline-flex; gap: 10px; flex-wrap: wrap; align-items: center; color: var(--muted); font-size: 13px; }
+.checks label { display: inline-flex; gap: 4px; align-items: center; color: var(--ink); }
+.progress { height: 8px; border-radius: 4px; background: var(--bar-bg); overflow: hidden; margin: 10px 0 4px; }
+.progress > div { height: 100%; width: 0; background: var(--accent); }
+.bench-msg { font-size: 14px; margin: 4px 0; }
+.bench-msg[data-phase="failed"] { color: var(--bad); }
+.bench-msg[data-phase="done"] { color: var(--good); }
+.prompt { margin: 12px 0; padding: 14px; border-radius: 10px; border: 2px solid var(--warn); color: var(--warn); font-size: 22px; font-weight: 800; text-align: center; }
+.prompt[data-l="go"] { border-color: var(--good); color: var(--good); }
+.prompt[data-l="stop"] { border-color: var(--bad); color: var(--bad); }
+.verdict { margin: 12px 0; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); font-weight: 600; }
+.verdict[data-l="ok"] { border-color: var(--good); }
+.verdict[data-l="warn"] { border-color: var(--warn); }
+.verdict[data-l="bad"] { border-color: var(--bad); }
+.btable { width: 100%; border-collapse: collapse; margin: 6px 0 14px; font-size: 13.5px; }
+.btable caption { text-align: left; font-weight: 700; padding: 8px 0 4px; }
+.btable th, .btable td { text-align: left; padding: 5px 10px 5px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; vertical-align: top; }
+.btable th { color: var(--muted); font-weight: 500; }
+.btable td.bad { color: var(--bad); font-weight: 700; }
+.tablewrap { overflow-x: auto; }
+.bchart { margin: 8px 0 14px; }
+.bchart h3 { margin: 0 0 4px; font-size: 14px; }
+.bchart svg { width: 100%; max-width: 720px; height: auto; }
+.bnotes { color: var(--muted); font-size: 12.5px; padding-left: 18px; }
+.rtl { direction: rtl; unicode-bidi: plaintext; }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Black, like the rest of MBUDDY. -->
+    <style name="Theme.MBUDDY" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:navigationBarColor">#000000</item>
+        <item name="android:textColor">#F5F3EE</item>
+        <item name="colorAccent">#FFCC33</item>
+    </style>
+</resources>

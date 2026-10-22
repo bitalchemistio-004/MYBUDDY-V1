@@ -1,0 +1,57 @@
+groq
+openai>=1,<2
+
+numpy
+python-dotenv
+aiohttp
+pyserial>=3.5
+
+# edge-tts is no longer the runtime voice (Kokoro is); kept only for
+# tools/bench_stt.py, which uses it once to build a scripted test set.
+edge-tts==7.2.8
+miniaudio==1.71
+
+# Local speech (Phase 2): Whisper STT and Kokoro TTS on the GPU
+faster-whisper==1.2.1
+kokoro-onnx==0.6.1
+onnxruntime-gpu==1.23.2       # replaces onnxruntime; Kokoro runs on CUDA
+nvidia-cublas-cu12            # CUDA runtime libraries for CTranslate2 and
+nvidia-cudnn-cu12>=9,<10      # onnxruntime-gpu; stt/cuda_libs.py puts their
+nvidia-cufft-cu12             # DLL folders on the Windows search path
+nvidia-cuda-runtime-cu12
+nvidia-curand-cu12
+openwakeword==0.6.0           # "Hey Buddy" wake word
+
+# Semantic Memory [NEW]
+faiss-cpu
+sentence-transformers
+
+# Web Search [NEW]
+requests
+beautifulsoup4
+ddgs>=9.1
+
+# Audio DSP pipeline  [UPGRADED]
+webrtcvad-wheels==2.0.14   # WebRTC VAD — pre-compiled, no C++ toolchain needed
+scipy>=1.9                 # IIR high-pass filter (butter + lfilter)
+
+# Content Awareness [v5.0.0-SENTIENCE]
+mss>=9.0.1                 # Screen capture (cross-platform)
+Pillow>=10.0.0             # Image processing
+anthropic>=0.18.0          # Claude Vision API (optional)
+google-genai>=0.1.0        # Gemini Vision API (uses the already-configured GEMINI_API_KEY)
+
+# System control tools
+pycaw                      # Real Windows system-volume control (Core Audio API)
+comtypes                   # pycaw's COM dependency
+
+# Windows media session (what is playing: exact title, artist, state)
+winrt-runtime==3.2.1
+winrt-Windows.Foundation==3.2.1
+winrt-Windows.Foundation.Collections==3.2.1
+winrt-Windows.Media.Control==3.2.1
+
+# Documents: read attachments, write reports, drive Word/Excel (S78)
+python-docx
+pypdf
+pywin32

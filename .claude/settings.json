@@ -1,0 +1,6 @@
+{
+  "enabledPlugins": {
+    "data-engineering@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true
+  }
+}

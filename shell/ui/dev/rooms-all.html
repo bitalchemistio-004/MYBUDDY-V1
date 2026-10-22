@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Every room</title>
+<link rel="stylesheet" href="../css/room.css">
+<style>
+  body { margin: 0; padding: 12px; background: #0b0b0d; color: #eee; font: 12px system-ui, sans-serif; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  figure { margin: 0; } figcaption { margin: 2px 0 6px; color: #aaa; }
+  svg { width: 100%; height: auto; display: block; border-radius: 6px; }
+</style></head><body>
+<h1 style="font-size:15px;margin:0 0 8px">Developer preview: each room at level 1 (start) and level 5 (everything upgraded). ?lv=1|5</h1>
+<div class="grid" id="g"></div>
+<script type="module">
+import { ST, PLACES, roomSVG } from "../js/room/art.js";
+const CHARS = ["blink", "void", "glitch", "cinder", "oracle"], g = document.getElementById("g");
+const lv = new URLSearchParams(location.search).get("lv");
+for (const c of CHARS) for (const L of (lv ? [+lv] : [1, 5])) {
+  ST.levels[c] = Object.fromEntries(PLACES.map((p) => [p, L])); ST.owned[c] = {}; ST.eggs = { mouse: true };
+  g.insertAdjacentHTML("beforeend", `<figure><svg viewBox="0 0 880 500" shape-rendering="crispEdges">${roomSVG(c, "")}</svg><figcaption>${c} · level ${L}</figcaption></figure>`);
+}
+</script></body></html>

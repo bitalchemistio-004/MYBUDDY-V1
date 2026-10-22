@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" data-theme="clay" data-look="nocturne">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBUDDY</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/glass.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/cards.css">
+<link rel="stylesheet" href="css/sections.css">
+<link rel="stylesheet" href="css/nocturne.css">
+<link rel="stylesheet" href="css/decor.css">
+<link rel="stylesheet" href="css/room.css">
+</head>
+<body>
+<div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="app">
+  <header class="titlebar" data-tauri-drag-region>
+    <span class="brand" data-tauri-drag-region>MBUDDY</span>
+    <span class="grow" data-tauri-drag-region></span>
+    <button class="wc" id="wc-min" type="button" aria-label="Minimize"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 6h10" stroke="currentColor" stroke-width="1.6"/></svg></button>
+    <button class="wc" id="wc-max" type="button" aria-label="Maximize"><svg width="12" height="12" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+    <button class="wc close" id="wc-close" type="button" aria-label="Close to tray"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.6"/></svg></button>
+  </header>
+  <div class="body" id="body">
+    <nav class="rail" id="sidebar" aria-label="Sections"></nav>
+    <div class="main">
+      <div class="needs" id="needs" hidden role="alertdialog" aria-labelledby="needs-t">
+        <span class="tagline">Needs you</span><b id="needs-t"></b>
+        <span class="row"><button class="btn accent" id="needs-yes" type="button">Yes, do it</button><button class="btn" id="needs-no" type="button">No</button></span>
+      </div>
+      <main class="content" id="content"></main>
+      <form class="askbar" id="askbar" autocomplete="off">
+        <div class="askreply" id="ask-reply" hidden aria-live="polite"></div>
+        <div class="askrow">
+          <label for="ask-in" class="sr">Ask MBUDDY</label>
+          <input class="field" id="ask-in" placeholder="Ask or tell MBUDDY something" maxlength="1000">
+          <button class="btn accent" id="ask-send" type="submit">Send</button>
+          <button class="btn ghost" id="ask-close" type="button" aria-label="Hide the answer">Hide</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="toast glass" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

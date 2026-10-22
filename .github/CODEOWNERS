@@ -1,0 +1,14 @@
+# Who is asked to review what. The last matching line wins.
+# Everything starts with the lead maintainer; add area owners here as people join (see GOVERNANCE.md).
+*                                   @bitalchemistio-004
+
+# What MBUDDY may and may not do on someone's phone: always reviewed with its tests
+/android/app/src/main/kotlin/app/mbuddy/mobile/Screen.kt      @bitalchemistio-004
+/android/app/src/main/kotlin/app/mbuddy/mobile/Privacy.kt     @bitalchemistio-004
+/android/app/src/test/                                        @bitalchemistio-004
+
+# Project files that decide how the project is run
+/LICENSE                            @bitalchemistio-004
+/SECURITY.md                        @bitalchemistio-004
+/GOVERNANCE.md                      @bitalchemistio-004
+/.github/                           @bitalchemistio-004
