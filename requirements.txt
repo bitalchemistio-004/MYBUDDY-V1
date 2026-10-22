@@ -16,7 +16,7 @@ faster-whisper==1.2.1
 kokoro-onnx==0.6.1
 onnxruntime-gpu==1.23.2       # replaces onnxruntime; Kokoro runs on CUDA
 nvidia-cublas-cu12            # CUDA runtime libraries for CTranslate2 and
-nvidia-cudnn-cu12>=9,<10      # onnxruntime-gpu; stt/cuda_libs.py puts their
+nvidia-cudnn-cu12>=9.27.0.42,<10      # onnxruntime-gpu; stt/cuda_libs.py puts their
 nvidia-cufft-cu12             # DLL folders on the Windows search path
 nvidia-cuda-runtime-cu12
 nvidia-curand-cu12
