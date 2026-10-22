@@ -14,7 +14,7 @@ miniaudio==1.71
 # Local speech (Phase 2): Whisper STT and Kokoro TTS on the GPU
 faster-whisper==1.2.1
 kokoro-onnx==0.6.1
-onnxruntime-gpu==1.23.2       # replaces onnxruntime; Kokoro runs on CUDA
+onnxruntime-gpu==1.24.1       # replaces onnxruntime; Kokoro runs on CUDA
 nvidia-cublas-cu12            # CUDA runtime libraries for CTranslate2 and
 nvidia-cudnn-cu12>=9,<10      # onnxruntime-gpu; stt/cuda_libs.py puts their
 nvidia-cufft-cu12             # DLL folders on the Windows search path
