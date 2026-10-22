@@ -7,8 +7,8 @@ The maintainer can paste each of these as an issue labelled `good first issue`.
 
 ## Easy (an afternoon)
 
-1. **Add a few more words to Word shuffle.** `WORDS` in `shell/ui/js/papp/games.js`. Keep them 4 to 9 letters. A test already
-   checks every word shuffles into a different order.
+1. **Level up the games.** New mechanics, levels, effects or a new game in `shell/ui/js/papp/` (`games.js`, `quest.js`,
+   `gameshell.js`). The tests in `shell/ui/tests/` check progress and levels.
 2. **A new tip.** One-time hints are in `shell/ui/js/papp/tips.js`. Add a hint where a feature is easy to miss, and use `tipHtml`.
 3. **A new monster for Buddy Quest.** `MONSTERS` in `shell/ui/js/papp/quest.js` and a 12-by-10 dot picture in `pixart.js`.
    The quest tests check each room is harder than the last.
@@ -35,8 +35,6 @@ Run `setup.bat` first; `python -m pytest -q` should then be all green (a few tes
     longer uses. Make it check what `core/setup_checks.py` checks today (Ollama and its model, the Kokoro files, the GPU).
 16. **A CPU-only install** (easy to medium). `requirements.txt` always installs about 2.4 GB of CUDA packages. Add a
     `requirements-cpu.txt` without them, and make `setup.bat -Cpu` use it.
-17. **Hide Blender's splash screen** (medium). When MBUDDY shows a result in Blender, the splash screen covers the model. Find a
-    way in `brain/connectors/app_driver.py` (`_show`) to open Blender without it; check with a real Blender.
 18. **Don't lose a working skill** (medium). In `app_driver._keep`, a failed rerun of a task overwrites that task's skill note,
     including the script that worked before. Keep the working script and add the failed try underneath; add a test.
 19. **setup for macOS and Linux** (medium). `setup.ps1` is Windows only. A `setup.sh` doing the same steps would let more people
@@ -44,12 +42,23 @@ Run `setup.bat` first; `python -m pytest -q` should then be all green (a few tes
 
 ## Bigger (talk first)
 
+Open areas with an issue each, where your own ideas are the point: [the games](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/25),
+[a design overhaul](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/26), [new character shapes](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/27), [the learning system](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/28),
+[performance](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/29), [macOS and Linux](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/30), [cross-device features](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/31),
+[guest profiles](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/32), [real Office documents](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/33), [the buddy as cursor and a whiteboard](https://github.com/bitalchemistio-004/MYBUDDY-V1/issues/34).
+
+
 11. **One source for the brain's rules.** The quick rules and tool list exist twice (`phone-actions.js` and `QuickRules.kt`,
     `runTool` and `NativeBrain.deviceAction`). Design a shared description, then migrate one tool at a time.
 12. **Split the bridge.** `Bridge.kt` holds about 95 methods. Group them by area, with one place that checks the call came from the
     bundled page.
 13. **A first run that needs no key.** A small bundled model or an offline answer set so the very first question works.
 14. **The desk device on the new brain.** Bring the firmware's face states in line with the phone's buddy states.
+
+## Have an idea of your own?
+
+You don't need a listed task. Share it in [Share your ideas](https://github.com/bitalchemistio-004/MYBUDDY-V1/discussions/35): features, designs, characters, games,
+hardware, anything. Ideas people like become issues anyone can pick up.
 
 ## How to start
 
