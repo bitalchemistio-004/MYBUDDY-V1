@@ -33,7 +33,7 @@ ddgs>=9.1
 
 # Audio DSP pipeline  [UPGRADED]
 webrtcvad-wheels==2.0.14   # WebRTC VAD — pre-compiled, no C++ toolchain needed
-scipy>=1.9                 # IIR high-pass filter (butter + lfilter)
+scipy>=1.15.3                 # IIR high-pass filter (butter + lfilter)
 
 # Content Awareness [v5.0.0-SENTIENCE]
 mss>=9.0.1                 # Screen capture (cross-platform)
