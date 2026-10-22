@@ -1,17 +1,42 @@
-# Keeps dependencies from going stale quietly: a pull request is opened when a new version is out.
+# Keeps dependencies from going stale quietly, without a flood of pull requests:
+# - one grouped pull request per area per month (CI tests it before anyone merges);
+# - no automatic major upgrades (they change how things build: done by hand, on purpose);
+# - Python: security fixes only. CI doesn't run the Python suite (it needs the GPU speech stack), so routine bumps
+#   would merge untested. The GPU stack (onnxruntime-gpu, nvidia-*, faster-whisper, ctranslate2) moves only together,
+#   by hand, after a test on a real GPU.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: gradle
     directory: "/android"
     schedule:
       interval: monthly
-    open-pull-requests-limit: 5
+    groups:
+      android:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: pip
     directory: "/"
     schedule:
       interval: monthly
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0     # 0 = no routine bumps; security updates still open their own pull requests
+    ignore:
+      - dependency-name: "onnxruntime-gpu"
+      - dependency-name: "nvidia-*"
+      - dependency-name: "faster-whisper"
+      - dependency-name: "ctranslate2"
