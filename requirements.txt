@@ -39,7 +39,7 @@ scipy>=1.9                 # IIR high-pass filter (butter + lfilter)
 mss>=9.0.1                 # Screen capture (cross-platform)
 Pillow>=10.0.0             # Image processing
 anthropic>=0.18.0          # Claude Vision API (optional)
-google-genai>=0.1.0        # Gemini Vision API (uses the already-configured GEMINI_API_KEY)
+google-genai>=2.31.0        # Gemini Vision API (uses the already-configured GEMINI_API_KEY)
 
 # System control tools
 pycaw                      # Real Windows system-volume control (Core Audio API)
