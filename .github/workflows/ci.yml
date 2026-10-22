@@ -34,7 +34,7 @@ jobs:
         working-directory: android
         run: ./gradlew --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug
       # The APK is ~68 MB: kept on main only, and for 3 days (at 90 days every push used the account's Actions storage).
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: github.ref == 'refs/heads/main'
         with:
           name: mbuddy-debug-apk
