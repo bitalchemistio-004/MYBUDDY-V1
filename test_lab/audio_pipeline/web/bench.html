@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBUDDY Test Benches</title>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/bench.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Test benches</h1>
+    <p class="sub">Speaker · echo &amp; barge-in · speech-to-text · voice detection · network — <a href="/">← microphone lab</a></p>
+  </div>
+  <div class="badges">
+    <span class="badge" id="badge-server" data-state="bad">server: connecting…</span>
+    <span class="badge" id="badge-device" data-state="bad">device: not connected</span>
+  </div>
+</header>
+
+<div id="banner" class="banner" hidden></div>
+
+<main class="benchwrap">
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Test benches"></nav>
+  <section id="panel" class="card"></section>
+</main>
+
+<script src="/static/bench.js"></script>
+</body>
+</html>

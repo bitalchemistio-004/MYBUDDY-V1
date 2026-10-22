@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Normal permission (granted at install): lets the app ask the clock app to set an alarm or a timer. -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <!-- Asked for the first time an event is added to the calendar, never before. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <!-- Only to look a person up by name when you ask to message or call them; asked in Settings, never read otherwise. -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- Asked the first time the buddy needs to hear your yes or no; typing and the buttons on its card work without it. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- "Hey buddy": a listening service (shown in the notification bar), kept awake while it waits, and allowed to open an app by voice. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- What the app may look at on the phone: whether Google AI Edge Gallery is installed, and who can handle each action. -->
+    <queries>
+        <package android:name="com.google.ai.edge.gallery" />
+        <intent><action android:name="android.intent.action.SET_ALARM" /></intent>
+        <intent><action android:name="android.intent.action.SET_TIMER" /></intent>
+        <intent><action android:name="android.intent.action.DIAL" /></intent>
+        <intent><action android:name="android.intent.action.SENDTO" /><data android:scheme="smsto" /></intent>
+        <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="https" /></intent>
+        <!-- To open an app by its name when a task asks for it, and to use the phone's own speech engines. -->
+        <intent><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent>
+        <intent><action android:name="android.speech.RecognitionService" /></intent>
+        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+    </queries>
+
+    <application
+        android:name=".MBuddyApp"
+        android:allowBackup="false"
+        android:icon="@drawable/ic_launcher"
+        android:label="MBUDDY"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MBUDDY"
+        android:usesCleartextTraffic="true">
+        <!-- Cleartext is only ever used if the user chose the home Wi-Fi address (http://192.168...); a Tailscale address is https. -->
+
+        <activity android:name=".SetupActivity" android:exported="true" android:theme="@style/Theme.MBUDDY">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity>
+
+        <activity android:name=".MainActivity" android:exported="false" android:launchMode="singleTask" android:configChanges="orientation|screenSize|keyboardHidden" android:windowSoftInputMode="adjustResize" />
+
+        <!-- The phone's assistant button: pick MBUDDY under Default apps, Digital assistant app. -->
+        <service android:name=".AssistService" android:exported="true" android:label="MBUDDY"
+            android:permission="android.permission.BIND_VOICE_INTERACTION">
+            <meta-data android:name="android.voice_interaction" android:resource="@xml/voice_interaction" />
+            <intent-filter><action android:name="android.service.voice.VoiceInteractionService" /></intent-filter>
+        </service>
+        <service android:name=".AssistSessionService" android:exported="true" android:permission="android.permission.BIND_VOICE_INTERACTION" />
+        <service android:name=".AssistRecognitionService" android:exported="true" />
+
+        <!-- Listens for "hey buddy" on the phone, only while the owner has it switched on; the notification can stop it. -->
+        <receiver android:name=".SmartReceiver" android:exported="false" />
+        <receiver android:name=".UpdatedReceiver" android:exported="false"><intent-filter><action android:name="android.intent.action.MY_PACKAGE_REPLACED" /></intent-filter></receiver>
+        <receiver android:name=".CarReceiver" android:exported="false"><intent-filter><action android:name="android.bluetooth.device.action.ACL_CONNECTED" /></intent-filter></receiver>
+        <service android:name=".MessageListener" android:exported="true" android:label="MBUDDY" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter>
+        </service>
+        <receiver android:name=".BootReceiver" android:exported="false"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter></receiver>
+        <receiver android:name=".NextWidget" android:exported="false" android:label="MBUDDY: what is next">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/next_widget_info" />
+        </receiver>
+        <receiver android:name=".TasksWidget" android:exported="false" android:label="MBUDDY: tasks">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/tasks_widget_info" />
+        </receiver>
+        <receiver android:name=".AskWidget" android:exported="false" android:label="MBUDDY: ask">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/ask_widget_info" />
+        </receiver>
+        <receiver android:name=".PlayWidget" android:exported="false" android:label="MBUDDY: play and streak">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/play_widget_info" />
+        </receiver>
+        <receiver android:name=".TodayWidget" android:exported="false" android:label="MBUDDY: today">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/today_widget_info" />
+        </receiver>
+        <receiver android:name=".FocusWidget" android:exported="false" android:label="MBUDDY: focus">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/focus_widget_info" />
+        </receiver>
+        <receiver android:name=".WidgetActionReceiver" android:exported="false" />
+        <service android:name=".PrivacyTile" android:exported="true" android:label="Privacy mode" android:icon="@drawable/ic_notify"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter><action android:name="android.service.quicksettings.action.QS_TILE" /></intent-filter>
+            <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE" android:value="true" />
+        </service>
+        <receiver android:name=".PrivacyReceiver" android:exported="false" />
+        <service android:name=".AskTile" android:exported="true" android:label="Ask MBUDDY" android:icon="@drawable/ic_notify"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter><action android:name="android.service.quicksettings.action.QS_TILE" /></intent-filter>
+        </service>
+        <service android:name=".WakeService" android:exported="false" android:foregroundServiceType="microphone" />
+
+        <!-- The model on the phone may use the graphics chip; these are optional, the phone's processor does it when they are missing. -->
+        <uses-native-library android:name="libvndksupport.so" android:required="false" />
+        <uses-native-library android:name="libOpenCL.so" android:required="false" />
+
+        <!-- Screen control. Off until the owner turns it on in Android settings, Accessibility; it does nothing by itself. -->
+        <service
+            android:name=".ControlService"
+            android:exported="true"
+            android:label="MBUDDY screen control"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/mbuddy_accessibility" />
+        </service>
+    </application>
+</manifest>

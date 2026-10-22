@@ -1,0 +1,37 @@
+name: Feature request
+description: An idea for something MBUDDY could do
+labels: [enhancement, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Good ideas start from a real moment: something you tried to do and could not. Tell us about that moment first.
+        Remember the ground rules: only real features, always ask before anything irreversible, private by default.
+  - type: textarea
+    id: moment
+    attributes:
+      label: What were you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like MBUDDY to do?
+    validations:
+      required: true
+  - type: dropdown
+    id: part
+    attributes:
+      label: Which part?
+      options: [Phone app (Android), PC app (Windows), Desk device (ESP32), All of them, Not sure]
+  - type: textarea
+    id: privacy
+    attributes:
+      label: Does it touch anything private?
+      description: "Screen, microphone, messages, contacts, files, anything sent off the device. If yes, how should it ask first?"
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Would you like to build it?
+      options:
+        - label: I would like to work on this (a maintainer will help you get started)

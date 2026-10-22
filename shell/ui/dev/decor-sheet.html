@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Every decoration on every buddy</title>
+<style>
+  body { margin: 0; padding: 12px; background: #0b0b0d; color: #eee; font: 11px system-ui, sans-serif; }
+  h2 { font-size: 14px; margin: 14px 0 8px; }
+  .row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+  figure { margin: 0; background: #131318; border: 1px solid #2b2b2b; border-radius: 6px; padding: 4px; }
+  figcaption { font-size: 10px; color: #aaa; margin-top: 2px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  svg.t { width: 100%; height: auto; display: block; background: #3b3f4d; border-radius: 4px; }
+</style></head><body>
+<h1 style="font-size:15px;margin:0">Developer preview: every decoration (one at a time) on each buddy, from the app's own placement code. ?c=blink|void|glitch|cinder|oracle</h1>
+<div id="out"></div>
+<script type="module">
+import { placements, ITEM_FIT } from "../js/buddy/wardrobe-fit.js";
+import { pixelGroup } from "../js/buddy/wardrobe-pixel.js";
+const params = new URLSearchParams(location.search);
+const CHARS = params.get("c") ? [params.get("c")] : ["blink", "void", "glitch", "cinder", "oracle"];
+const COL = { blink: "#f2f2f0", void: "#a98cff", glitch: "#5fd0e6", cinder: "#ff8a3d", oracle: "#e8c15a" };
+const SLOTS = ["crown", "eyes", "neck", "back", "hand", "aura"];
+const sheet = new URL("../assets/buddy/chars/", import.meta.url);
+const out = document.getElementById("out");
+for (const c of CHARS) {
+  const keys = Object.keys(ITEM_FIT[c]);
+  let html = `<h2>${c} · ${keys.length} decorations</h2><div class="row">`;
+  for (const k of keys) {
+    const slot = SLOTS.find((s) => k.startsWith(s + "-")); if (!slot) continue;
+    const id = k.slice(slot.length + 1);
+    const items = placements(c, { [slot]: id }, "room", { styles: { [slot]: "pixel" }, ink: "char" });
+    const layer = (n) => items.filter((p) => p.layer === n).map((p) => `<g style="--wd-ink:${COL[c]}" transform="translate(${p.x} ${p.y}) scale(${p.k})">${pixelGroup(`${p.slot}-${p.id}`)}</g>`).join("");
+    html += `<figure><svg class="t" viewBox="0 0 320 240">${layer("back")}<svg viewBox="0 0 320 240" width="320" height="240"><image href="${new URL(c + "/idle.webp", sheet).href}" width="2560" height="1440"/></svg>${layer("front")}</svg><figcaption>${slot} · ${id}</figcaption></figure>`;
+  }
+  out.insertAdjacentHTML("beforeend", html + "</div>");
+}
+</script></body></html>

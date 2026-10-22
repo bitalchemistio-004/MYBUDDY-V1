@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A black pill with two white eyes: the same shape as the first buddy, drawn as plain vector shapes. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp" android:height="96dp" android:viewportWidth="96" android:viewportHeight="96">
+    <path android:fillColor="#000000" android:pathData="M0,0h96v96h-96z" />
+    <path android:fillColor="#0E0E10" android:strokeColor="#3A3A40" android:strokeWidth="2"
+        android:pathData="M30,34h36a14,14 0 0 1 14,14v0a14,14 0 0 1 -14,14h-36a14,14 0 0 1 -14,-14v0a14,14 0 0 1 14,-14z" />
+    <path android:fillColor="#F5F3EE" android:pathData="M38,48m-5,0a5,6.5 0 1 0 10,0a5,6.5 0 1 0 -10,0" />
+    <path android:fillColor="#F5F3EE" android:pathData="M58,48m-5,0a5,6.5 0 1 0 10,0a5,6.5 0 1 0 -10,0" />
+</vector>

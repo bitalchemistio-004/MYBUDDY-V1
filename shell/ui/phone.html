@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MBUDDY Phone tools</title>
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/pwa/icon-192.png">
+<link rel="apple-touch-icon" href="assets/pwa/icon-192.png">
+<link rel="stylesheet" href="css/phone.css">
+<script>window.__MBUDDY_REMOTE__ = true; if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});</script>
+</head>
+<body>
+<header class="top">
+  <div><h1>Phone tools</h1><p class="sub">Alarms, timers, calendar, calls and messages, and the AI on this phone. These work without your PC.</p></div>
+  <span class="chip" id="conn"><span class="dot"></span><span id="conn-t">checking…</span></span>
+</header>
+<main id="app" aria-live="polite"></main>
+<noscript><p style="padding:16px">This page needs JavaScript.</p></noscript>
+<script src="js/native-shim.js"></script>
+<script type="module" src="js/phone-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+/* The notch (popup style "notch"): a thin pill that floats at the top of the screen.
+     rest  a long, thin strip: the character's face, one word, the time            (300 x 32)
+     peek  the same pill, wider: what it says, a question with its answers, the job (460 wide)
+     room  a short wide pill: the character, what it says, the things you use, a line to type (640 wide)
+   It grows sideways first and only a little downwards. The window is as large as the shape (buddy.js fit()),
+   so the layout changes size at once and the shape is animated on top of that (clip-path); nothing here
+   transitions width or height. The glow colour says what kind of moment it is (--glow, set by buddy/notch.js:
+   a deadline close, a job, a focus sprint, music, a question for you, ...); the character's own colour is the
+   default. The character is shown cropped to its face (buddy/notch.js CROPS), never stretched. */
+@font-face { font-family: "NSpace"; src: url("../assets/fonts/spacegrotesk.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "NDoto"; src: url("../assets/fonts/doto.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+/* the character inside the pill: cropped to the part shown (--k scale, --cx --cy the crop's corner in the 320x240 art) */
+body.nmode .stage { transition: width .4s cubic-bezier(.22, 1.1, .36, 1), height .4s cubic-bezier(.22, 1.1, .36, 1); position: relative; bottom: auto; right: auto; left: auto; flex: none; overflow: hidden; width: var(--sprite-w, 46px); height: var(--sprite-h, 22px); cursor: pointer; }
+body.nmode .sprite-wrap { position: absolute; left: 0; top: 0; width: 320px; height: 240px; transform-origin: 0 0;
+  transform: translate(calc(var(--cx, 0) * var(--k, 1) * -1px), calc(var(--cy, 0) * var(--k, 1) * -1px)) scale(var(--k, 1)); transition: transform .4s cubic-bezier(.22, 1.1, .36, 1); }
+body.nmode canvas.sprite { filter: none; }
+body.nmode .aura { display: none; }
+body.nmode .side { position: static; display: flex; flex-direction: column; gap: 4px; width: auto; max-width: none; align-items: stretch; }
+body.nmode .side > * { transform-origin: 0 50%; }
+body.nmode .side > .tail::before { display: none; }
+
+.notch { position: absolute; top: var(--gap, 6px); left: 50%; transform: translateX(-50%); width: max-content; font-family: "NSpace", var(--font); --glow: var(--bac); isolation: isolate; }
+/* the glow is its own layer behind the pill: only its opacity is animated, so it is painted once and moved by the GPU */
+.nglow { position: absolute; inset: 0; z-index: -1; view-transition-name: nglow; border-radius: var(--r-pill, 18px); pointer-events: none; opacity: .62;
+  box-shadow: 0 0 calc(22px * var(--gk, 1)) color-mix(in srgb, var(--glow) min(100%, calc(60% * var(--gk, 1))), transparent); transition: opacity .4s; }
+.notch[data-n="room"] .nglow { border-radius: var(--r-room, 26px); }
+.shell { position: relative; box-sizing: border-box; display: flex; justify-content: center; align-items: flex-start; background: #050506; color: var(--btx); overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--glow) 42%, #26262b); border-radius: var(--r-pill, 18px); contain: layout paint; view-transition-name: nshell;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .06);
+  transition: border-color .4s, opacity .4s, transform .25s cubic-bezier(.2, 1.3, .4, 1); }
+/* the contents have their own fixed width per size, so the pill's size can change without laying them out again */
+.inner { flex: none; display: flex; flex-direction: column; }
+.notch[data-n="rest"] .inner { width: var(--w-rest, 300px); }
+.notch[data-n="peek"] .inner { width: calc(var(--w-rest, 300px) + 160px); }
+.notch[data-n="room"] .inner { width: 640px; }
+/* compact (the default): at rest only the face and the mood dot; it widens just to fit a reply, a question or a job (--w-peek, buddy/notch.js) */
+.notch[data-length="compact"][data-n="rest"] .inner { width: auto; }
+.notch[data-length="compact"][data-n="rest"] .nline b, .notch[data-length="compact"][data-n="rest"] .nmeta { display: none; }
+.notch[data-length="compact"][data-n="rest"] .nbar { gap: 8px; padding: 4px 12px 4px 10px; }
+.notch[data-length="compact"][data-n="peek"] .inner { width: var(--w-peek, 300px); }
+/* with the clock off there is nothing to fill the end of a longer resting pill, so it fits what is in it */
+.notch[data-clock="0"][data-n="rest"] .inner { width: auto; min-width: 0; }
+.notch[data-n="room"] .shell { border-radius: var(--r-room, 26px); }
+
+/* hover: the pill lifts, its glow rises and a light sweeps across */
+.shell::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(105deg, transparent 35%, color-mix(in srgb, var(--glow) min(100%, calc(22% * var(--gk, 1))), transparent) 50%, transparent 65%); transform: translateX(-120%); }
+.notch[data-n="rest"] .shell:hover { transform: translateY(1px) scale(1.012); border-color: color-mix(in srgb, var(--glow) 80%, #fff); }
+.notch[data-n="rest"]:hover .nglow { opacity: 1; }
+.notch[data-n="rest"] .shell:hover::after { animation: nsweep .9s ease-out; }
+@keyframes nsweep { to { transform: translateX(120%); } }
+
+.nbar { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 4px 14px 4px 12px; min-height: var(--bar-h, 30px); }
+.scene { display: flex; align-items: center; flex: none; }
+.nline { display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; flex: 1; }
+/* "Text only": no face at all, just the line and the field to type in (the character stays in the app and the corner) */
+.notch[data-face="none"] .scene { display: none; }
+.notch[data-n="peek"] .nline, .notch[data-n="room"] .nline { flex: none; }
+/* a long status ("Timer: your 1 minute timer is done") gives way, so a question's answers beside it are never cut off */
+.notch[data-n="peek"] .nline { flex: 0 1 auto; max-width: 190px; }
+.ndot { width: 8px; height: 8px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 9px var(--glow); flex: none; transition: background .5s, box-shadow .5s; }
+.nline b { font-size: 13px; font-weight: 700; letter-spacing: .01em; overflow: hidden; text-overflow: ellipsis; }
+.nmeta { margin-left: auto; font-size: 12px; opacity: .72; font-variant-numeric: tabular-nums; padding-left: 10px; white-space: nowrap; }
+.notch[data-n="peek"] .nmeta, .notch[data-n="room"] .nmeta { margin-left: 0; padding-left: 4px; }
+.nclose { margin-left: auto; min-height: 30px; padding: 0 12px; border-radius: 99px; border: 1px solid #2f2f35; background: transparent; color: var(--btx); font: 700 12px "NSpace", var(--font); cursor: pointer; transition: border-color .2s, transform .15s; }
+.nclose:hover { border-color: var(--glow); transform: scale(1.04); }
+.nclose { width: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+.nclose svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.nside { display: flex; flex: 1; min-width: 0; flex-direction: column; justify-content: center; }
+.nside[hidden] { display: none; }
+.notch[data-n="room"] .talk { display: none; }
+
+/* what it says / asks / works on, as one tidy line each inside the strip */
+body.nmode .talk { width: auto; max-width: none; padding: 0; background: transparent; border: 0; box-shadow: none; font-size: 13px; line-height: 1.3; }
+body.nmode .talk small { display: inline; margin: 0 6px 0 0; font-size: 12px; }
+body.nmode .talk span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+body.nmode .act { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; width: auto; padding: 0; background: transparent; border: 0; box-shadow: none; }
+body.nmode .act small { font-size: 12px; }
+body.nmode .act p { flex: 1; min-width: 120px; font-size: 13px; }
+body.nmode .act .acts { flex: none; }
+body.nmode .act button { min-height: 30px; padding: 0 12px; border-radius: 99px; transition: transform .15s, border-color .2s; }
+body.nmode .act button:hover { transform: scale(1.05); }
+/* A question (a timer or task that is done, a reminder, a message): the strip stacks. The face and the word stay on the top row, the words
+   get a full-width line of their own below (at most three lines, then cut), and the answers sit under them. The words are never squeezed
+   into the one row beside the face, which made the pill grow sideways and then jump taller. */
+.notch[data-stack="1"] .nbar { flex-wrap: wrap; row-gap: 6px; }
+.notch[data-stack="1"] .nline { flex: 1 1 0; max-width: none; }
+.notch[data-stack="1"] .nside { flex: 1 1 100%; order: 5; }
+body.nmode .notch[data-stack="1"] .act { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 6px; }
+body.nmode .notch[data-stack="1"] .act p { flex: none; min-width: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+body.nmode .notch[data-stack="1"] .act .acts { display: flex; justify-content: flex-end; gap: 8px; }
+body.nmode .bub { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 2px 8px; width: auto; padding: 0; background: transparent; border: 0; box-shadow: none; cursor: pointer; }
+body.nmode .bub .bh { display: contents; }
+body.nmode .bub .bi { width: 24px; height: 24px; border-radius: 8px; font-size: 13px; }
+body.nmode .bub .bt small { font-size: 12px; }
+body.nmode .bub .bt b { font-size: 13px; -webkit-line-clamp: 1; }
+body.nmode .bub .bp { font-size: 13px; }
+body.nmode .bub .bth, body.nmode .bub .bs { display: none; }
+body.nmode .bub .bb { grid-column: 1 / -1; height: 3px; }
+body.nmode .cap { height: 22px; padding: 0; border: 0; background: transparent; box-shadow: none; }
+
+/* glow by kind of moment: a deadline closing in warms from amber to red; a job is blue; focus indigo; music pink; a question for you red */
+.notch[data-m="listen"] { --glow: #3fd8ff; }
+.notch[data-m="think"] { --glow: #b68cff; }
+.notch[data-m="work"] { --glow: #4da3ff; }
+.notch[data-m="focus"] { --glow: #7a8cff; }
+.notch[data-m="music"] { --glow: #ff5ccf; }
+.notch[data-m="hot"] { --glow: #ff7a2f; }
+.notch[data-m="done"] { --glow: #34c759; }
+.notch[data-m="near"] { --glow: #ffb020; }
+.notch[data-m="soon"] { --glow: #ff7a2f; }
+.notch[data-m="due"], .notch[data-m="alert"] { --glow: #ff4a2e; }
+.notch[data-m="near"] .nglow { animation: npulse 3.4s ease-in-out infinite; }
+.notch[data-m="soon"] .nglow { animation: npulse 1.8s ease-in-out infinite; }
+.notch[data-m="due"] .nglow, .notch[data-m="alert"] .nglow { animation: npulse 1s ease-in-out infinite; }
+.notch[data-m="work"] .ndot, .notch[data-m="focus"] .ndot, .notch[data-m="listen"] .ndot, .notch[data-m="think"] .ndot { animation: nbeat 1.1s ease-in-out infinite; }
+.notch[data-m="listen"] .nline b::after { content: ""; display: inline-block; width: 20px; height: 10px; margin-left: 8px; vertical-align: -1px;
+  background: repeating-linear-gradient(90deg, var(--glow) 0 3px, transparent 3px 6px); transform: scaleY(calc(.3 + var(--lvl, 0))); transition: transform .12s linear; }
+.notch.flash .nglow { animation: nflash 1s ease-out; }
+@keyframes npulse { 50% { opacity: 1; } }
+@keyframes nbeat { 50% { transform: scale(1.5); opacity: .55; } }
+@keyframes nflash { 0% { opacity: 1; transform: scale(1.06, 1.35); } }
+
+/* progress: the level ring, the "+10" that rises from the face, one check when a job is done */
+.nlevel { display: inline-flex; align-items: center; gap: 6px; flex: none; font: 700 12px "NSpace", var(--font); color: var(--btx); opacity: .9; }
+.nlevel[hidden] { display: none; }
+.nring { width: 18px; height: 18px; border-radius: 50%; flex: none;
+  background: conic-gradient(var(--glow) calc(var(--p, 0) * 360deg), #2a2a30 0);
+  -webkit-mask: radial-gradient(circle, transparent 5px, #000 6px); mask: radial-gradient(circle, transparent 5px, #000 6px); transition: background .6s; }
+.nreward { position: absolute; left: 22px; top: 6px; font: 700 14px "NSpace", var(--font); color: var(--glow); pointer-events: none;
+  text-shadow: 0 0 10px var(--glow); animation: nreward 1.6s cubic-bezier(.2, .8, .3, 1) forwards; z-index: 3; }
+@keyframes nreward { 0% { opacity: 0; transform: translateY(8px) scale(.8); } 20% { opacity: 1; transform: translateY(-2px) scale(1.12); } 100% { opacity: 0; transform: translateY(-9px) scale(1); } }
+.notch.proud .nglow { animation: nproud 1.1s ease-out; }
+@keyframes nproud { 0% { opacity: 1; transform: scale(1.08, 1.5); } 100% { opacity: .62; transform: none; } }
+/* a job is done: the dot becomes one check, once (nine seconds, the length of the "done" mood) */
+.notch[data-m="done"] .ndot { background: transparent; box-shadow: none; width: 12px; height: 12px; position: relative; }
+.notch[data-m="done"] .ndot::after { content: ""; position: absolute; left: 3px; top: -1px; width: 4px; height: 9px; border: solid var(--glow); border-width: 0 2px 2px 0; transform: rotate(45deg); transform-origin: 50% 50%; animation: ncheck .45s ease-out; }
+@keyframes ncheck { from { height: 0; opacity: 0; } to { height: 9px; opacity: 1; } }
+/* a press feels pressed */
+.nbtn:active, .nclose:active { transform: scale(.94); transition-duration: .06s; }
+
+/* room: the same pill, a little taller: the tools in one row, a line to type */
+.nchips { display: none; align-items: center; gap: 10px; flex: none; }
+.notch[data-n="room"] .nchips { display: flex; }
+.notch[data-n="room"] .nclose { margin-left: 0; }
+.notch[data-n="room"] .nbar { padding: 8px 14px 4px 14px; min-height: 56px; }
+.notch[data-n="room"] .nline b { font: 700 15px "NSpace", var(--font); max-width: 170px; }
+.notch[data-n="room"] .nmeta { font: 700 14px "NSpace", var(--font); opacity: .8; }
+.chip-prop { position: relative; width: 22px; height: 22px; color: var(--glow); opacity: .3; transition: opacity .4s, filter .4s; }
+.chip-prop svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.chip-prop:not(.on) { display: none; }     /* a glyph is there only while it is true: nothing is playing, so no disc */
+.chip-prop.on { opacity: 1; filter: drop-shadow(0 0 5px var(--glow)); }
+.chip-prop.spin.on svg { animation: nspin 3s linear infinite; }
+@keyframes nspin { to { transform: rotate(360deg); } }
+.nroom { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #1c1c20; margin: 0 14px; padding: 8px 0 10px; }
+.nsay { display: none; margin: 0; flex: 1; min-width: 0; font-size: 13px; line-height: 1.35; opacity: .92; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.notch[data-n="room"] .nsay { display: block; }
+.nsay.quiet { opacity: .62; }
+.nask { display: flex; gap: 8px; align-items: center; padding: 6px 8px 6px 14px; border: 1px solid #ff4a2e; border-radius: 99px; }
+.nask span { flex: 1; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nroom button, .nroom input { font-family: "NSpace", var(--font); }
+.nbtn { min-height: 32px; padding: 0 12px; border-radius: 99px; border: 1px solid #2a2a30; background: transparent; color: var(--btx); font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: transform .15s cubic-bezier(.2, 1.4, .4, 1), border-color .2s, box-shadow .2s, background .2s; }
+.nbtn svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.nbtn:hover, .nbtn:focus-visible { transform: translateY(-1px) scale(1.05); border-color: var(--glow); box-shadow: 0 0 12px color-mix(in srgb, var(--glow) min(100%, calc(45% * var(--gk, 1))), transparent); outline: none; }
+.nbtn.go { background: var(--btx); color: #000; border-color: var(--btx); }
+.nbtn[aria-pressed="true"] { background: var(--glow); color: #000; border-color: var(--glow); }
+.nbtn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
+.nacts { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 8px; }
+.nacts .nbtn.icon { width: 34px; padding: 0; }
+.nacts .nbtn.icon span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.ncompose { display: flex; gap: 8px; align-items: center; }
+.ncompose input { flex: 1; min-width: 0; min-height: 34px; border-radius: 99px; border: 1px solid #2a2a30; background: #0b0b0d; color: var(--btx); padding: 0 14px; font-size: 13px; outline: none; user-select: text; transition: border-color .2s, box-shadow .2s; }
+.ncompose input:focus { border-color: var(--glow); box-shadow: 0 0 12px color-mix(in srgb, var(--glow) min(100%, calc(35% * var(--gk, 1))), transparent); }
+.nnext { font-size: 12px; opacity: .72; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 16px; }
+
+[data-motion="reduced"] .notch * { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) { .notch * { animation: none !important; transition: none !important; } }
+
+/* ---- the notch's own settings (buddy/notch.js configure) ---- */
+.notch[data-border="none"] .shell { border-color: transparent; }
+.notch[data-glow="off"] .nglow { display: none; }
+.notch[data-glow="off"] .ndot { box-shadow: none; }
+.notch[data-clock="0"] .nmeta { display: none; }
+.notch[data-word="0"] .nline b { display: none; }
+.notch[data-dim="1"][data-n="rest"] .shell:not(:hover) { opacity: .6; }
+.notch[data-breath="1"][data-n="rest"] .nglow { animation: nbreathe 5.5s ease-in-out infinite; }
+@keyframes nbreathe { 50% { opacity: .95; } }
+/* breathing is a quiet idle: a mood's own pulse (above) replaces it because those rules come later */
+
+/* ---- small movements that answer what you do (off with the "Small movements" switch or reduced motion) ---- */
+.notch[data-micro="1"] .shell:active { transform: scale(.975); }
+.notch[data-micro="1"] .shell::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(160px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--glow) 24%, transparent), transparent 70%); }
+.notch[data-micro="1"] .shell:hover::before { opacity: 1; }
+.notch[data-micro="1"] .nbtn:active { transform: scale(.9); }
+.notch[data-micro="1"] .nbtn { position: relative; overflow: hidden; }
+.rip { position: absolute; border-radius: 50%; pointer-events: none; background: color-mix(in srgb, var(--glow) 55%, #fff); transform: translate(-50%, -50%) scale(0); opacity: .55; animation: nrip .55s ease-out forwards; }
+@keyframes nrip { to { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+.nbtn.ok { animation: nok .7s ease-out; }
+.nbtn.bad { animation: nshake .45s ease-in-out; border-color: #ff4a2e; }
+@keyframes nok { 0% { background: #34c759; border-color: #34c759; color: #000; transform: scale(1.12); } 100% { } }
+@keyframes nshake { 20%, 60% { transform: translateX(-3px); } 40%, 80% { transform: translateX(3px); } }
+.nsay.in { animation: nslide .35s cubic-bezier(.2, 1, .3, 1); }
+@keyframes nslide { from { opacity: 0; transform: translateX(-10px); } }
+.ndot.ping::after { content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid var(--glow); animation: nping .8s ease-out forwards; }
+.ndot { position: relative; }
+@keyframes nping { to { transform: scale(3.2); opacity: 0; } }
+.nmeta.tick { animation: ntick .35s ease-out; }
+@keyframes ntick { from { transform: translateY(-6px); opacity: 0; } }
+.shell.wobble { animation: nwobble .7s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes nwobble { 20% { transform: translateY(2px) scale(1.03, .94); } 50% { transform: translateY(-1px) scale(.99, 1.04); } 80% { transform: none; } }
+.notch[data-micro="1"] .chip-prop.on { animation: npop .45s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes npop { 0% { transform: scale(.4); } 100% { transform: none; } }
+body.nmode .side > * { transform: translateX(-10px) scale(.96); }
+body.nmode .side > .show { transform: none; }
+.ncompose .nbtn.go.busy { pointer-events: none; opacity: .7; }
+.ncompose .nbtn.go.busy::after { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #000; border-top-color: transparent; animation: nspin .7s linear infinite; }
+
+/* ---- opening and closing: the browser morphs the old pill into the new one (View Transitions), on the GPU ---- */
+/* While the browser morphs the pill it draws its own pictures over the page, and by default those catch the pointer: a click on
+   a button during the morph went to nothing (the notch was "hard to catch" while it opened). They never take the pointer. */
+::view-transition, ::view-transition-group(*), ::view-transition-image-pair(*), ::view-transition-old(*), ::view-transition-new(*) { pointer-events: none; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-group(nshell), ::view-transition-group(nglow) { animation-duration: .56s; animation-timing-function: linear(0.000, 0.056, 0.190, 0.360, 0.535, 0.695, 0.829, 0.933, 1.006, 1.052, 1.076, 1.083, 1.080, 1.069, 1.055, 1.040, 1.027, 1.015, 1.006, 1.000, 0.996, 0.994, 0.993, 0.993, 0.994, 0.995, 0.997, 0.998, 0.999, 0.999, 1.000, 1.000, 1.001, 1.001, 1.001, 1.000, 1.000); }
+html[data-nclosing] ::view-transition-group(nshell), html[data-nclosing] ::view-transition-group(nglow) { animation-duration: .42s; animation-timing-function: linear(0.000, 0.038, 0.126, 0.234, 0.345, 0.451, 0.547, 0.630, 0.701, 0.760, 0.809, 0.849, 0.881, 0.906, 0.927, 0.943, 0.956, 0.966, 0.973, 0.980, 0.984, 0.988, 0.991, 0.993, 0.995, 0.996, 0.997, 0.998, 0.998, 0.999, 0.999, 0.999, 0.999, 1.000, 1.000, 1.000, 1.000); }
+::view-transition-old(nshell), ::view-transition-new(nshell), ::view-transition-old(nglow), ::view-transition-new(nglow) { animation-duration: .56s; }
+html[data-nclosing] ::view-transition-old(nshell), html[data-nclosing] ::view-transition-new(nshell) { animation-duration: .42s; }
+
+/* ---- centred text that turns round when it is too long ---- */
+.nline { justify-content: center; }
+.nline b.mq { flex: 0 1 auto; min-width: 0; max-width: 100%; }
+.mq { overflow: hidden; white-space: nowrap; text-align: center; min-width: 0; }
+.mq-track { display: inline-flex; }
+.mq-gap { flex: none; width: 36px; }
+.mq.cut .mq-t { display: block; overflow: hidden; text-overflow: ellipsis; }
+.mq.run { text-align: left; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.mq.run .mq-track { animation: mq var(--mq-d, 8s) linear infinite; }
+@keyframes mq { 0%, 12% { transform: none; } 100% { transform: translateX(calc(var(--mq-w, 100px) * -1)); } }
+.nsay { text-align: center; }
+.nsay.mq { display: none; }
+.notch[data-n="room"] .nsay.mq { display: block; }
+
+/* ---- the room shows one thing at a time ---- */
+.nhead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.nhead b { font-size: 14px; letter-spacing: .02em; }
+.nhead .nbtn { padding: 0 12px 0 8px; }
+.nviewbox[hidden], .nhome[hidden] { display: none; }
+.nview { min-height: 0; }
+.nview .nbtn[aria-pressed="true"] { background: var(--glow); color: #000; border-color: var(--glow); }
+
+/* music: the record, the song, the controls, the level */
+.mv { display: grid; grid-template-columns: 112px minmax(0, 1fr) 150px; gap: 16px; align-items: center; min-height: 118px; }
+.mv.none .mv-disc, .mv.none .mv-mid, .mv.none .mv-side { display: none; }
+.mv-empty { grid-column: 1 / -1; margin: 0; text-align: center; font-size: 13px; opacity: .85; display: flex; gap: 12px; align-items: center; justify-content: center; }
+.mv-empty[hidden] { display: none; }
+.mv-disc svg { width: 108px; height: 108px; display: block; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .6)); }
+.mv-disc.spin svg { animation: nspin 3.4s linear infinite; }
+.v-body { fill: #0c0c0f; stroke: #2a2a30; stroke-width: 1; }
+.v-groove { fill: none; stroke: #1b1b20; stroke-width: 1.2; }
+.v-shine { fill: none; stroke: rgba(255, 255, 255, .22); stroke-width: 2; stroke-linecap: round; }
+.v-label { fill: var(--glow); }
+.v-hole { fill: #050506; }
+.mv-title { font: 700 17px "NSpace", var(--font); height: 24px; }
+.mv-artist { text-align: center; font-size: 13px; opacity: .72; margin: 2px 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mv-prog { display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: .8; font-variant-numeric: tabular-nums; }
+.mv-prog[hidden] { display: none; }
+.mv-bar { flex: 1; height: 4px; border-radius: 4px; background: #232328; overflow: hidden; }
+.mv-bar i { display: block; height: 100%; width: 0; background: var(--glow); box-shadow: 0 0 8px var(--glow); }
+.mv-ctl { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 10px; }
+.nbtn.icon.big { width: 44px; height: 44px; min-height: 44px; background: var(--btx); color: #000; border-color: var(--btx); }
+.nbtn.icon.big svg { width: 20px; height: 20px; }
+.mv-side { display: flex; flex-direction: column; gap: 10px; }
+.mv-vol { display: grid; gap: 4px; font-size: 12px; opacity: .85; }
+.mv-vol input { width: 100%; accent-color: var(--glow); }
+.mv-level { display: flex; gap: 3px; align-items: flex-end; height: 30px; }
+.mv-level i { flex: 1; border-radius: 2px; background: #25252a; transition: background .08s; }
+.mv-level i.on { background: var(--glow); box-shadow: 0 0 6px var(--glow); }
+.faint { opacity: .6; font-size: 12px; }
+
+/* timer and focus: the dial, the time, the choices */
+.tv { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 18px; align-items: center; min-height: 168px; }
+.dial { width: 164px; height: 164px; touch-action: none; cursor: pointer; outline: none; }
+.d-face { fill: #0a0a0d; stroke: #2a2a30; stroke-width: 1.5; }
+.d-arc { stroke: var(--glow); stroke-width: 6; stroke-linecap: round; filter: drop-shadow(0 0 5px var(--glow)); }
+.d-tick { stroke: #4a4a52; stroke-width: 1.4; }
+.d-num { fill: #8a8a92; font: 600 10px "NSpace", var(--font); text-anchor: middle; }
+.d-handle { fill: #fff; stroke: var(--glow); stroke-width: 2.5; cursor: grab; }
+.dial:focus-visible .d-face { stroke: var(--glow); }
+.tv-read { font: 800 34px "NSpace", var(--font); font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.tv-sub { font-size: 12px; opacity: .72; margin: 2px 0 10px; min-height: 16px; }
+.tv-set, .tv-run { display: grid; gap: 8px; }
+.tv-set[hidden], .tv-run[hidden] { display: none; }
+.tv-until { font-size: 12px; opacity: .9; display: flex; align-items: center; gap: 8px; }
+.tv input[type="time"], .kv input[type="time"] { min-height: 32px; border-radius: 99px; border: 1px solid #2a2a30; background: #0b0b0d; color: var(--btx); padding: 0 10px; font: 600 13px "NSpace", var(--font); color-scheme: dark; }
+.nrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+/* task and reminder: a month, a time, what to do (typed or spoken) */
+.kv { display: grid; grid-template-columns: 218px minmax(0, 1fr); gap: 18px; align-items: start; }
+.kc-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; font-size: 13px; }
+.kc-head .nbtn.icon { width: 28px; height: 28px; min-height: 28px; }
+.kc-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 12px; }
+.kc-grid > span { opacity: .55; font-size: 11px; padding: 2px 0; }
+.kc-day { height: 26px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--btx); font: 600 12px "NSpace", var(--font); cursor: pointer; transition: background .15s, transform .12s; }
+.kc-day:hover:not(:disabled) { background: #1b1b20; transform: scale(1.1); }
+.kc-day:disabled { opacity: .28; cursor: default; }
+.kc-day[aria-pressed="true"] { background: var(--glow); color: #000; box-shadow: 0 0 10px var(--glow); }
+.kv-form { display: grid; gap: 8px; }
+.kv-say { display: flex; gap: 6px; }
+.kv-input { flex: 1; min-width: 0; min-height: 36px; border-radius: 99px; border: 1px solid #2a2a30; background: #0b0b0d; color: var(--btx); padding: 0 14px; font: 500 13px "NSpace", var(--font); outline: none; user-select: text; }
+.kv-input:focus { border-color: var(--glow); box-shadow: 0 0 12px color-mix(in srgb, var(--glow) 35%, transparent); }
+.kv-time { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; }
+.kv-time label { display: flex; align-items: center; gap: 6px; }
+.kv-sum { font-size: 13px; font-weight: 600; min-height: 18px; }
+#kv-mic[aria-pressed="true"] { background: #ff4a2e; border-color: #ff4a2e; color: #000; animation: nbeat 1s ease-in-out infinite; }
+
+
+/* ---- decoration (Settings, Buddy, Wardrobe, Notch): frame, shape, plate, ledge, lamp, pins; only what is unlocked (core/wardrobe.py) ---- */
+.notch[data-frame="glow"] .shell { border-color: var(--glow); box-shadow: 0 0 22px color-mix(in srgb, var(--glow) 40%, transparent), 0 6px 18px rgba(0, 0, 0, .5); }
+.notch[data-frame="double"] .shell { box-shadow: 0 0 0 3px #000, 0 0 0 4px #3a3a42, 0 6px 18px rgba(0, 0, 0, .5); }
+.notch[data-frame="dashed"] .shell { border-style: dashed; border-color: #4a4a54; }
+.notch[data-frame="rainbow"] .shell { border-color: transparent; background: linear-gradient(#050506, #050506) padding-box, linear-gradient(90deg, #ff7ab6, #ffd35a, #5fd0e6, #a98cff) border-box; }
+/* attached: it hangs from the very top edge and flares into it */
+.notch[data-shape="attached"] { top: 0; }
+.notch[data-shape="attached"] .shell, .notch[data-shape="attached"] .nglow { border-radius: 0 0 var(--r-pill, 18px) var(--r-pill, 18px); border-top-width: 0; }
+.notch[data-shape="attached"][data-n="room"] .shell, .notch[data-shape="attached"][data-n="room"] .nglow { border-radius: 0 0 var(--r-room, 26px) var(--r-room, 26px); }
+.nflare { display: none; position: absolute; top: 0; width: 14px; height: 14px; pointer-events: none; z-index: 1; }
+.notch[data-shape="attached"] .nflare { display: block; }
+.nflare.l { left: -14px; background: radial-gradient(circle at 0 100%, transparent 13px, #050506 13.5px); }
+.nflare.r { right: -14px; background: radial-gradient(circle at 100% 100%, transparent 13px, #050506 13.5px); }
+/* the lamp */
+.notch[data-lamp="ring"] .ndot { background: transparent; border: 2px solid var(--glow); width: 11px; height: 11px; box-shadow: 0 0 8px var(--glow); }
+.notch[data-lamp="bars"] .ndot { width: 12px; height: 10px; border-radius: 0; background: repeating-linear-gradient(90deg, var(--glow) 0 3px, transparent 3px 5px); box-shadow: none; }
+.notch[data-lamp="heart"] .ndot { width: 11px; height: 10px; border-radius: 0; box-shadow: none; clip-path: path("M5.5 10 C-2 4 1 -1 5.5 2.5 C10 -1 13 4 5.5 10Z"); }
+/* the pins: small glyphs beside the word, up to three */
+.npins { display: inline-flex; gap: 5px; align-items: center; flex: none; color: rgba(255, 255, 255, .8); }
+.npins:empty, .notch[data-length="compact"][data-n="rest"] .npins { display: none; }
+.npins svg { width: 15px; height: 15px; fill: currentColor; }
+/* the open notch: a plate on the left with the character standing on a ledge, the tools and the line to type on the right */
+.nplate { display: none; }
+.notch[data-n="room"] .inner { box-sizing: border-box; position: relative; padding-left: 176px; min-height: 236px; }
+.notch[data-n="room"] .nplate { display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 176px; overflow: hidden; border-radius: 25px 0 0 25px; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--glow) 16%, transparent), transparent 70%); }
+.notch[data-n="room"][data-shape="attached"] .nplate { border-top-left-radius: 0; }
+.notch[data-plate="glass"] .nplate { background: linear-gradient(160deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .02)); }
+.notch[data-plate="dots"] .nplate { background: radial-gradient(rgba(255, 255, 255, .14) 1px, transparent 1.3px) 0 0 / 9px 9px; }
+.notch[data-plate="aurora"] .nplate { background: radial-gradient(ellipse at 20% 0, rgba(120, 90, 255, .3), transparent 60%), radial-gradient(ellipse at 90% 100%, rgba(40, 200, 190, .25), transparent 60%); }
+.nfloor { position: absolute; left: 14px; right: 10px; bottom: 14px; height: 40px; background: radial-gradient(ellipse at 50% 0, color-mix(in srgb, var(--glow) 38%, transparent), transparent 70%); }
+.nledge { position: absolute; left: 20px; right: 16px; bottom: 28px; height: var(--ledge-h, 3px); border-radius: 3px; background: var(--ledge-bg, #33353d); box-shadow: var(--ledge-sh, none); }
+.notch[data-ledge="neon"] { --ledge-bg: #5fcf8e; --ledge-sh: 0 0 12px #5fcf8e; --ledge-h: 4px; }
+.notch[data-ledge="rainbow"] { --ledge-bg: linear-gradient(90deg, #ff7ab6, #ffd35a, #5fd0e6, #a98cff); --ledge-h: 5px; }
+.notch[data-ledge="wood"] { --ledge-bg: repeating-linear-gradient(90deg, #6a4a2a 0 10px, #8a6238 10px 20px); --ledge-h: 8px; }
+.notch[data-ledge="gold"] { --ledge-bg: #ffc933; --ledge-sh: 0 0 10px #ffc933; --ledge-h: 5px; }
+.notch[data-n="room"] .scene { position: absolute; left: 0; width: 176px; bottom: calc(var(--ledge-h, 3px) + 28px + 18px); justify-content: center; z-index: 1; }
+.notch[data-n="room"] .nbar { padding-left: 6px; }
+/* the open notch's right side fills the plate's height: what it says and the tools on top, the line to type at the bottom */
+.notch[data-n="room"] .inner { display: flex; flex-direction: column; }
+.notch[data-n="room"] .nroom { flex: 1; display: flex; flex-direction: column; }
+.notch[data-n="room"] .nhome { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.notch[data-n="room"] .nhome .nask { order: 1; }
+.notch[data-n="room"] .nhome .nacts { order: 2; padding-bottom: 0; }
+.notch[data-n="room"] .nhome .ncompose { order: 3; margin-top: auto; }
+.notch[data-n="room"] .nsay { text-align: left; }
+/* trying a decoration on (Settings, Buddy): a small tag under the notch */
+.notch[data-try="1"]::after { content: "Trying on · not earned"; position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%); padding: 2px 10px; border-radius: 99px;
+  background: var(--glow); color: #000; font: 700 10px "NSpace", var(--font); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; pointer-events: none; }

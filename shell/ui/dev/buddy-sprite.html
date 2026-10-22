@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buddy sprite harness</title>
+<style>
+  /* A developer page for the drawn buddy: every clip side by side, plus the
+     real player and state machine driven by the event buttons. Serve shell/ui
+     over http (fetch does not work from file://) and open dev/buddy-sprite.html;
+     ?event=<name> fires one event on load, ?reduced=1 turns on reduced motion. */
+  :root { color-scheme: dark; --ink: #111317; --panel: #1a1d24; --line: #2b303b; --text: #ecebe6; --mute: #9aa0ab; }
+  body { margin: 0; padding: 16px; background: var(--ink); color: var(--text); font: 14px/1.5 system-ui, sans-serif; }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  .main { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .main canvas { background: #262b35; border-radius: 8px; }
+  .now { font-variant-numeric: tabular-nums; color: var(--mute); }
+  .events { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  button { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+  .card canvas { display: block; background: #262b35; border-radius: 6px; }
+  .card b { display: block; margin-bottom: 6px; }
+  .card span { color: var(--mute); font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Buddy sprite harness</h1>
+<div class="main"><canvas id="main"></canvas><div class="now" id="now">loading</div></div>
+<div class="events" id="events"></div>
+<div class="grid" id="grid"></div>
+<script type="module">
+import { ClipPlayer } from "../js/buddy/clip-player.js";
+import { loadClips, createSpriteBuddy, ClipImages, SpriteRenderer, runLoop } from "../js/buddy/sprite.js";
+import { EVENTS, OFF_EVENTS } from "../js/buddy/state.js";
+
+const q = new URLSearchParams(location.search);
+const reduced = q.get("reduced") === "1";
+const character = q.get("character") || "blink";
+const { sheet, name: cast } = await loadClips(character);
+const now = () => performance.now();
+const k = 0.5;  // the 320x240 art at half size
+
+function sized(canvas) {
+  canvas.style.width = `${sheet.width * k}px`;
+  canvas.style.height = `${sheet.height * k}px`;
+  return canvas;
+}
+
+// The same wiring the buddy window uses: the state machine picks the clip,
+// the player plays it.
+const buddy = await createSpriteBuddy({ character, reducedMotion: reduced });
+buddy.attach(sized(document.getElementById("main")));
+const { state, player } = buddy;
+window.__buddyDebug = { fire: (e) => state.fire(e), get clip() { return state.clip; } };
+
+// Every clip on its own, all looping, to see the art. This page loads every
+// sheet at once, which the buddy window never does.
+const minis = [];
+const all = new ClipImages(cast, { keep: Infinity });
+await Promise.all([...sheet.tags.keys()].map((c) => all.load(c)));
+for (const name of sheet.tags.keys()) {
+  const card = document.createElement("div");
+  card.className = "card";
+  const cv = sized(document.createElement("canvas"));
+  const r = new SpriteRenderer(all, sheet);
+  r.attach(cv);
+  const p = new ClipPlayer(sheet, { now, loops: new Set(sheet.tags.keys()), reducedMotion: reduced, maxStep: 250 });
+  p.play(name);
+  const t = sheet.tags.get(name);
+  card.innerHTML = `<b>${name}</b>`;
+  card.append(cv);
+  card.insertAdjacentHTML("beforeend", `<span>${t.to - t.from + 1} frames, ${t.direction}, ${sheet.loops.has(name) ? "loop" : "one-shot"}</span>`);
+  document.getElementById("grid").append(card);
+  minis.push([p, r]);
+}
+
+const events = document.getElementById("events");
+for (const name of [...Object.keys(EVENTS), ...Object.keys(OFF_EVENTS)]) {
+  const b = document.createElement("button");
+  b.textContent = name;
+  b.onclick = () => state.fire(name);
+  events.append(b);
+}
+
+const label = document.getElementById("now");
+runLoop(() => {
+  for (const [p, r] of minis) if (p.update()) r.draw(p);
+  label.textContent = `clip: ${state.clip}  playing: ${player.name}  frame: ${player.frameIndex}  base: ${state.base}  queue: ${state.queue.join(",") || "-"}`;
+});
+for (const [p, r] of minis) r.draw(p);
+if (q.get("event")) state.fire(q.get("event"));
+</script>
+</body>
+</html>

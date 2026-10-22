@@ -1,0 +1,9 @@
+{
+  "left_db": 0.0,
+  "right_db": -20.0,
+  "gate_enabled": true,
+  "noise_rms": {
+    "left": 200.06257302404165,
+    "right": 90.6551604984515
+  }
+}

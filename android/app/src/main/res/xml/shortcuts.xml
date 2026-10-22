@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="ask" android:enabled="true" android:shortcutShortLabel="@string/sc_ask" android:shortcutLongLabel="@string/sc_ask_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="app.mbuddy.mobile" android:targetClass="app.mbuddy.mobile.SetupActivity">
+            <extra android:name="route" android:value="buddy" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="addtask" android:enabled="true" android:shortcutShortLabel="@string/sc_add" android:shortcutLongLabel="@string/sc_add_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="app.mbuddy.mobile" android:targetClass="app.mbuddy.mobile.SetupActivity">
+            <extra android:name="route" android:value="do/add" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="today" android:enabled="true" android:shortcutShortLabel="@string/sc_today" android:shortcutLongLabel="@string/sc_today_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="app.mbuddy.mobile" android:targetClass="app.mbuddy.mobile.SetupActivity">
+            <extra android:name="route" android:value="today" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="play" android:enabled="true" android:shortcutShortLabel="@string/sc_play" android:shortcutLongLabel="@string/sc_play_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="app.mbuddy.mobile" android:targetClass="app.mbuddy.mobile.SetupActivity">
+            <extra android:name="route" android:value="play" />
+        </intent>
+    </shortcut>
+</shortcuts>

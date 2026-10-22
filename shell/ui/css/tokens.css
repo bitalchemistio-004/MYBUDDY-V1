@@ -1,0 +1,96 @@
+/* MBUDDY design tokens: one source of truth for every window.
+   Clay is the default: a near-black warm base, solid surfaces, the clay
+   accent used sparingly (one primary action per screen and the active
+   place), liquid glass kept for two surfaces only (sidebar, Home hero).
+   A character theme swaps the accent and a faint tint, never the whole
+   surface colour (the old Ember theme turned every panel orange). */
+@font-face { font-family: "Nunito"; font-weight: 200 1000; font-display: swap; src: url("../assets/fonts/nunito.woff2") format("woff2"); }
+@font-face { font-family: "Baloo 2"; font-weight: 400 800; font-display: swap; src: url("../assets/fonts/baloo2.woff2") format("woff2"); }
+@font-face { font-family: "Cinzel"; font-weight: 400 900; font-display: swap; src: url("../assets/fonts/cinzel.woff2") format("woff2"); }
+@font-face { font-family: "Space Mono"; font-weight: 400; font-display: swap; src: url("../assets/fonts/spacemono-400.woff2") format("woff2"); }
+@font-face { font-family: "Space Mono"; font-weight: 700; font-display: swap; src: url("../assets/fonts/spacemono-700.woff2") format("woff2"); }
+
+:root, [data-theme="clay"] {
+  color-scheme: dark;
+  --display: "Baloo 2", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  /* surfaces, darkest to lightest */
+  --bg: #0b0a09;
+  --surface-1: #15120f;        /* cards */
+  --surface-2: #1d1915;        /* rows, fields, quiet buttons */
+  --surface-3: #27221d;        /* hover */
+  --line: rgba(255, 244, 235, .08);
+  --line-strong: rgba(255, 244, 235, .16);
+  /* text */
+  --text: #f4eee8;
+  --text-2: #bfb4aa;           /* secondary: must stay readable on surface-1 */
+  --text-3: #8d837a;           /* hints and captions only */
+  /* accent */
+  --accent: #d97757;
+  --accent-hover: #e38a6c;
+  --accent-soft: rgba(217, 119, 87, .16);
+  --accent-text: #f0a58a;      /* accent as text on dark surfaces */
+  --accent-ink: #1b0f0a;       /* text on the accent */
+  --tint: rgba(217, 119, 87, .10);
+  /* glass (sidebar and hero only) */
+  --glass-fill: rgba(255, 244, 235, .045);
+  --glass-edge: rgba(255, 244, 235, .12);
+  --glass-hi: rgba(255, 255, 255, .10);
+  /* states */
+  --ok: #7cc58a; --warn: #e8b45a; --bad: #e4675f; --listen: #86acd9;
+  --destructive: #e4675f; --destructive-soft: rgba(228, 103, 95, .14);
+  --shadow: rgba(0, 0, 0, .45);
+  --focus: #f0a58a;
+}
+/* "Match my buddy": the whole app takes the chosen character's look:
+   surfaces, lines, accent, corner radius and display font. One mechanism for
+   every window (the app, the quick panel); the floating buddy's bubbles use
+   the same colours. */
+[data-theme="blink"] {
+  --accent: #ffcc33; --accent-hover: #ffd75c; --accent-soft: rgba(255, 204, 51, .15);
+  --accent-text: #ffcc33; --accent-ink: #231a00; --tint: rgba(255, 204, 51, .07); --focus: #ffdc73;
+}
+[data-theme="void"] {
+  --bg: #0d0820; --surface-1: #160f34; --surface-2: #1f1646; --surface-3: #2b1f5c;
+  --line: rgba(139, 108, 255, .19); --line-strong: rgba(139, 108, 255, .34);
+  --accent: #b68cff; --accent-hover: #c6a5ff; --accent-soft: rgba(182, 140, 255, .17);
+  --accent-text: #c9adff; --accent-ink: #1a0840; --tint: rgba(182, 140, 255, .10); --focus: #cfb6ff;
+  --radius-lg: 24px; --radius: 22px; --radius-sm: 14px;
+}
+[data-theme="glitch"] {
+  --bg: #050f16; --surface-1: #0a1c28; --surface-2: #0f2838; --surface-3: #163648;
+  --line: rgba(25, 230, 255, .20); --line-strong: rgba(25, 230, 255, .36);
+  --text: #dffbff; --text-2: #8fc0cf; --text-3: #5f8fa0;
+  --accent: #19e6ff; --accent-hover: #5cedff; --accent-soft: rgba(25, 230, 255, .15);
+  --accent-text: #19e6ff; --accent-ink: #00222a; --tint: rgba(25, 230, 255, .07); --focus: #7ff1ff;
+  --radius-lg: 4px; --radius: 4px; --radius-sm: 3px;
+  --display: "Space Mono", "Cascadia Mono", Consolas, monospace;
+}
+[data-theme="cinder"] {
+  --bg: #150d0a; --surface-1: #221510; --surface-2: #2e1c14; --surface-3: #3b251a;
+  --line: rgba(255, 122, 47, .19); --line-strong: rgba(255, 122, 47, .34);
+  --accent: #ff7a2f; --accent-hover: #ff9152; --accent-soft: rgba(255, 122, 47, .17);
+  --accent-text: #ff9a5f; --accent-ink: #2a0e00; --tint: rgba(255, 122, 47, .10); --focus: #ffab7a;
+  --radius-lg: 14px; --radius: 12px; --radius-sm: 10px;
+}
+[data-theme="oracle"] {
+  --bg: #0f0d26; --surface-1: #181538; --surface-2: #211d4a; --surface-3: #2c275e;
+  --line: rgba(242, 193, 78, .20); --line-strong: rgba(242, 193, 78, .36);
+  --text-2: #c3b995;
+  --accent: #f2c14e; --accent-hover: #f5cf74; --accent-soft: rgba(242, 193, 78, .17);
+  --accent-text: #f2c14e; --accent-ink: #2a1f00; --tint: rgba(242, 193, 78, .08); --focus: #f6d88c;
+  --radius-lg: 16px; --radius: 14px; --radius-sm: 11px;
+  --display: "Cinzel", Georgia, serif;
+}
+:root {
+  /* shape */
+  --radius-lg: 20px; --radius: 16px; --radius-sm: 12px; --radius-pill: 999px;
+  /* 4px rhythm */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s8: 32px;
+  /* type: fonts shipped with the app (assets/fonts, open licence), nothing
+     fetched at run time; the Windows system font stands in until they load
+     and for scripts they do not cover. A theme may set its own --display. */
+  --font: "Nunito", "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --fs-caption: 12px; --fs-small: 13px; --fs-body: 15px; --fs-lead: 17px; --fs-h2: 20px; --fs-h1: 34px; --fs-hero: 40px;
+  /* motion */
+  --ease: cubic-bezier(.2, .8, .2, 1); --t-fast: .14s; --t: .22s;
+}

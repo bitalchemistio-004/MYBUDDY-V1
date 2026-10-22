@@ -1,0 +1,89 @@
+/* The app window's decoration (Settings, Buddy, Wardrobe, The app): skin, backdrop, cards, accent and the header scene.
+   Each is a data attribute on <html> set by js/app.js (applyDeco) from /ui/live, and only what is unlocked (core/wardrobe.py).
+   Nocturne is the default and has no rules here: everything below changes tokens the app already reads. */
+
+/* ---- skin: the surfaces, lines and text colours ---- */
+html[data-look="nocturne"][data-skin="paper"] {
+  --bg: #f1eee6; --surface-1: #fbfaf6; --surface-2: #f4f1e8; --surface-3: #e9e5d9; --line: #d9d4c6; --line-strong: #b9b3a2;
+  --text: #17171a; --text-2: #4a473f; --text-3: #6b675d; color-scheme: light;
+}
+html[data-look="nocturne"][data-skin="aurora"] {
+  --bg: #0b1030; --surface-1: rgba(255, 255, 255, .05); --surface-2: rgba(255, 255, 255, .09); --surface-3: rgba(255, 255, 255, .14);
+  --line: rgba(255, 255, 255, .2); --line-strong: rgba(255, 255, 255, .34); --text: #f3f4f8; --text-2: #cfd6e6; --text-3: #aab4cb;
+}
+html[data-look="nocturne"][data-skin="matrix"] {
+  --bg: #050806; --surface-1: #08100b; --surface-2: #0b1710; --surface-3: #12251a; --line: rgba(122, 255, 168, .2); --line-strong: rgba(122, 255, 168, .4);
+  --text: #e6fff0; --text-2: #9fd0b0; --text-3: #7aa88c;
+}
+html[data-look="nocturne"][data-skin="paper"] .ambient, html[data-look="nocturne"][data-skin="paper"] body { background: var(--bg); }
+html[data-look="nocturne"][data-skin="aurora"] .ambient, html[data-look="nocturne"][data-skin="aurora"] body { background: linear-gradient(150deg, #150c33, #08263a); }
+html[data-look="nocturne"][data-skin="matrix"] .ambient, html[data-look="nocturne"][data-skin="matrix"] body { background: var(--bg); }
+html[data-look="nocturne"][data-skin="paper"] .needs, html[data-look="nocturne"][data-skin="paper"] .askbar,
+html[data-look="nocturne"][data-skin="paper"] .field, html[data-look="nocturne"][data-skin="paper"] .switch { background: var(--surface-1); }
+html[data-look="nocturne"][data-skin="aurora"] .needs, html[data-look="nocturne"][data-skin="aurora"] .askbar,
+html[data-look="nocturne"][data-skin="matrix"] .needs, html[data-look="nocturne"][data-skin="matrix"] .askbar { background: transparent; }
+html[data-look="nocturne"][data-skin="paper"] .btn.accent, html[data-look="nocturne"][data-skin="paper"] .tabs a[aria-current="page"],
+html[data-look="nocturne"][data-skin="paper"] .seg button[aria-pressed="true"], html[data-look="nocturne"][data-skin="paper"] .toast { color: #fbfaf6; }
+html[data-look="nocturne"][data-skin="paper"] .btn.accent:hover { background: #000; }
+
+/* ---- accent: the one colour that glows ---- */
+html[data-accent="honey"] { --accent: #ffd83d; --accent-hover: #ffe27a; --accent-soft: rgba(255, 216, 61, .15); --accent-text: #ffd83d; --accent-ink: #231a00; --focus: #ffe27a; }
+html[data-accent="mint"] { --accent: #5fcf8f; --accent-hover: #86dcaa; --accent-soft: rgba(95, 207, 143, .15); --accent-text: #5fcf8f; --accent-ink: #00200f; --focus: #86dcaa; }
+html[data-accent="sky"] { --accent: #8fd4ff; --accent-hover: #b4e2ff; --accent-soft: rgba(143, 212, 255, .15); --accent-text: #8fd4ff; --accent-ink: #001a2a; --focus: #b4e2ff; }
+html[data-accent="rose"] { --accent: #ff7ab6; --accent-hover: #ff9ac8; --accent-soft: rgba(255, 122, 182, .15); --accent-text: #ff7ab6; --accent-ink: #2a0016; --focus: #ff9ac8; }
+html[data-accent="violet"] { --accent: #a98cff; --accent-hover: #c0a9ff; --accent-soft: rgba(169, 140, 255, .17); --accent-text: #bba3ff; --accent-ink: #160a40; --focus: #c0a9ff; }
+html[data-accent="ember"] { --accent: #ff8a3d; --accent-hover: #ffa162; --accent-soft: rgba(255, 138, 61, .17); --accent-text: #ff9a5f; --accent-ink: #2a1000; --focus: #ffa162; }
+
+/* ---- backdrop: a quiet pattern behind everything ---- */
+html[data-backdrop] body::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+html[data-backdrop="dots"] body::before { background: radial-gradient(color-mix(in srgb, var(--text) 16%, transparent) 1px, transparent 1.3px) 0 0 / 22px 22px; }
+html[data-backdrop="grain"] body::before { background: repeating-linear-gradient(0deg, color-mix(in srgb, var(--text) 5%, transparent) 0 1px, transparent 1px 3px); }
+html[data-backdrop="glow"] body::before { background: radial-gradient(900px 520px at 100% 100%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%), radial-gradient(600px 360px at 0 0, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%); }
+html[data-backdrop] .app { position: relative; z-index: 1; }
+
+/* ---- cards ---- */
+html[data-look="nocturne"][data-cards="fill"] .lcard, html[data-look="nocturne"][data-cards="fill"] .surface { background: var(--surface-2); border-color: var(--line); }
+html[data-look="nocturne"][data-cards="glow"] .lcard, html[data-look="nocturne"][data-cards="glow"] .surface { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 22%, transparent); }
+
+/* ---- the header: the character stands on a ledge, with a scene behind it ---- */
+html[data-look="nocturne"] .hero .stage { position: relative; }
+html[data-look="nocturne"] .hero .stage::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: 4px; height: 3px; border-radius: 3px; background: var(--ledge-bg, var(--line-strong)); box-shadow: var(--ledge-sh, none); }
+html[data-look="nocturne"][data-scene="skyline"] .hero::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 62%; pointer-events: none;
+  background: linear-gradient(90deg, transparent 0 2%, var(--accent) 2% 5%, transparent 5% 6%, var(--accent) 6% 11%, transparent 11% 13%, var(--accent) 13% 16%, transparent 16% 18%, var(--accent) 18% 25%, transparent 25% 27%) 0 100% / 280px 100% repeat-x; opacity: .13; mask-image: linear-gradient(0deg, #000, transparent); -webkit-mask-image: linear-gradient(0deg, #000, transparent); }
+html[data-look="nocturne"][data-scene="stars"] .hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .55;
+  background: radial-gradient(var(--accent) 1px, transparent 1.6px) 12px 18px / 61px 47px, radial-gradient(var(--accent) 1.4px, transparent 2px) 37px 6px / 83px 71px, radial-gradient(var(--accent) .8px, transparent 1.3px) 5px 40px / 37px 29px; }
+html[data-look="nocturne"] .hero > * { position: relative; }
+
+/* a decoration is being tried on: say so, and give a way out */
+.try-bar { position: fixed; left: 50%; bottom: 74px; transform: translateX(-50%); z-index: 70; display: flex; align-items: center; gap: 12px; padding: 7px 8px 7px 16px;
+  border-radius: 99px; background: var(--text); color: var(--bg); font: 600 12.5px var(--font); box-shadow: 0 8px 30px rgba(0, 0, 0, .5); }
+.try-bar[hidden] { display: none; }
+html[data-look] .try-bar .btn, html[data-look] .try-bar .btn:hover { min-height: 26px; background: transparent; color: var(--bg); border: 1.5px solid var(--bg); }
+
+/* Settings, Buddy: one page, a jump bar to find a part, and the real notch shown beside the settings */
+.bjump { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 14px; }
+.bjump button { background: none; border: 0; padding: 4px 0; color: var(--text-2); font: 600 13px var(--font); cursor: pointer; border-bottom: 1.5px solid transparent; }
+.bjump button:hover { color: var(--text); border-bottom-color: var(--accent); }
+.bgrid { display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 16px; align-items: start; }
+.bmain { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.bside { position: sticky; top: 8px; }
+@media (max-width: 1180px) { .bgrid { grid-template-columns: minmax(0, 1fr); } .bside { position: static; order: -1; } }
+.bprev h3 { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.bprev .seg button { min-height: 28px; padding: 0 10px; font-size: 12px; }
+.bframe { width: 100%; height: 232px; overflow: hidden; border-radius: 6px; background: #000; position: relative; }
+.bframe iframe { width: 668px; height: 370px; border: 0; transform: scale(.63); transform-origin: 0 0; pointer-events: none; background: transparent; }
+.bnote { margin: 8px 0 0; color: var(--text-2); font-size: 12.5px; }
+.bmore { margin-top: 6px; }
+.bmore > summary { cursor: pointer; color: var(--text-2); font-size: 13px; padding: 8px 0; }
+.bmore[open] > summary { color: var(--text); }
+
+/* Settings, Decorations: big sections that fold */
+.dsec { padding: 0; }
+.dsec > summary { display: flex; align-items: center; gap: 12px; padding: 14px 18px; cursor: pointer; list-style: none; }
+.dsec > summary::-webkit-details-marker { display: none; }
+.dsec > summary::before { content: "\25B8"; color: var(--text-3); transition: transform .15s; }
+.dsec[open] > summary::before { transform: rotate(90deg); }
+.dsec > summary h3 { margin: 0; }
+.dsec > summary .chip { margin-left: auto; }
+.dsec-b { padding: 0 18px 16px; display: flex; flex-direction: column; gap: 10px; }
+.dsec-b > .setting:first-child { padding-top: 0; }

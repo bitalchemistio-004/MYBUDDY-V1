@@ -1,0 +1,319 @@
+<!doctype html>
+<!-- The buddy while it listens or works on the phone, over whatever app it is operating, in the Nocturne look (true black, one
+     glowing subject, outlines not glass, dotted type for the state). Two styles, the owner's choice: a bar at the bottom, or an island that
+     grows out of the camera cutout. Movement is slow and staged on purpose: born, stretched, opened, then filled, and the reverse on
+     the way out. By default it shows only what matters (what it heard, the task, a question, the result); the steps in between are shown
+     only when the owner asks for them (Settings). The light round the screen's edge is drawn natively (EdgeGlow.kt).
+     Shown by the Android app (Overlay.kt): it calls window.agentUi({...}) and window.agentLeave(); this page calls AgentUi.answer(...)
+     and AgentUi.resize(...). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBUDDY at work</title>
+<style>
+  @font-face { font-family: "Space Grotesk"; src: url("assets/fonts/spacegrotesk.woff2") format("woff2"); font-display: block; }
+  @font-face { font-family: "Doto"; src: url("assets/fonts/doto.woff2") format("woff2"); font-display: block; }
+  @property --a { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+  :root { --c1: #ffcc33; --c2: #ff6fa8; --c3: #8b7bff; --ink: #f5f3ee; --dim: #9a9aa3; --bar: #000; --line: #222226; --alert: #ff9f1c;
+    --spring: cubic-bezier(.2, 1.15, .3, 1); --smooth: cubic-bezier(.5, 0, .12, 1); --out: cubic-bezier(.4, 0, .9, .4); color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; color: var(--ink); font: 16px/1.35 "Space Grotesk", system-ui, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  #wrap { position: fixed; inset: 0; }
+  .bar { position: absolute; box-sizing: border-box; background: var(--bar); border-radius: 28px; opacity: 0;
+    box-shadow: 0 0 0 1px #000, 0 -4px 26px color-mix(in srgb, var(--c1) 26%, transparent), 10px 0 30px color-mix(in srgb, var(--c2) 16%, transparent),
+      -10px 0 30px color-mix(in srgb, var(--c3) 16%, transparent); }
+  /* the outline: a slowly turning ring of the buddy's colours */
+  .bar::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.4px; pointer-events: none;
+    background: conic-gradient(from var(--a), var(--c1), var(--c2), var(--c3), var(--c1));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: turn 7s linear infinite; opacity: .95; transition: opacity .6s ease; }
+  @keyframes turn { to { --a: 360deg; } }
+  /* the island is grown out of the camera: nothing coloured is drawn on the camera side. The outline starts below the cutout and the
+     glow falls downwards and sideways only, so the card looks fused to the camera instead of wearing a ring over it. */
+  .bar[data-layout="island"] { transform-origin: 50% 0;
+    box-shadow: 0 0 0 1px #000, 0 12px 26px color-mix(in srgb, var(--c1) 24%, transparent), 8px 8px 26px color-mix(in srgb, var(--c2) 14%, transparent),
+      -8px 8px 26px color-mix(in srgb, var(--c3) 14%, transparent); }
+  .bar[data-layout="island"]::before { clip-path: inset(22px 0 0 0); }
+  .bar[data-mode="asking"] { --c1: var(--alert); --c2: #ffd166; --c3: #ff6b6b; }
+  .bar[data-mode="done"] { --c1: #4ade80; --c2: #a3f7bf; --c3: #22d3ee; }
+  .bar[data-mode="fail"] { --c1: #ff5a5f; --c2: #ff9f80; --c3: #ff3d81; }
+  .bar.calm::before { opacity: 0; }
+  .inner { position: absolute; left: 12px; top: 12px; }
+  .inner > * { transition: opacity .42s ease, transform .52s var(--spring), filter .42s ease; }
+  .inner > :nth-child(2) { transition-delay: .07s; } .inner > :nth-child(3) { transition-delay: .13s; } .inner > :nth-child(4) { transition-delay: .19s; } .inner > :nth-child(5) { transition-delay: .25s; }
+  .bar.hush .inner > * { opacity: 0; transform: translateY(8px); filter: blur(4px); transition-duration: .2s; transition-delay: 0s; }
+  .top { display: grid; grid-template-columns: 80px 1fr 36px; gap: 8px; align-items: center; }
+  /* the character: never cropped, never framed. It stands at the card's left end (a little above it in the bar) and floats. */
+  #buddy { position: relative; width: 104px; height: 78px; margin: -34px 0 -16px -20px; overflow: visible; background: none; border: 0;
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--c1) 55%, transparent)); animation: floaty 3.4s ease-in-out infinite; transition: transform .6s var(--spring); }
+  .bar[data-layout="island"] #buddy { margin-top: -6px; }
+  .bar.hush #buddy { transform: scale(.55); }
+  #buddy.hop { animation: hop .75s cubic-bezier(.3, 1.6, .4, 1); }
+  @keyframes floaty { 50% { transform: translateY(-4px); } }
+  @keyframes hop { 25% { transform: translateY(-16px) scale(1.08, .92); } 55% { transform: translateY(3px) scale(.94, 1.06); } }
+  /* done: the tick draws itself next to the word, and a few pieces fly out of the character */
+  #tick { width: 22px; height: 22px; flex: none; display: none; }
+  #tick path { fill: none; stroke: #4ade80; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 30; stroke-dashoffset: 30; }
+  .bar[data-mode="done"] #tick { display: block; }
+  .bar[data-mode="done"] #tick path { animation: draw .45s .1s ease-out forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .bit { position: absolute; width: 6px; height: 6px; border-radius: 2px; pointer-events: none; animation: burst .95s cubic-bezier(.2, .7, .3, 1) forwards; }
+  @keyframes burst { from { opacity: 1; transform: none; } to { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); } }
+  .state { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  #label { font: 600 20px/1 "Doto", "Space Mono", monospace; letter-spacing: .02em; color: var(--c1); white-space: nowrap; overflow: hidden; transition: color .6s ease; }
+  #label span { display: inline-block; white-space: pre; opacity: 0; transform: translateY(4px); animation: letter .38s var(--spring) forwards; }
+  @keyframes letter { to { opacity: 1; transform: none; } }
+  #step { color: var(--dim); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  #step:empty { display: none; }
+  .dots { display: inline-flex; gap: 4px; margin-left: auto; padding-right: 2px; transition: opacity .4s ease; }
+  .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--c1); opacity: .18; animation: dot 1.4s ease-in-out infinite; }
+  .dots i:nth-child(2) { animation-delay: .14s; background: color-mix(in srgb, var(--c1), var(--c2)); } .dots i:nth-child(3) { animation-delay: .28s; background: var(--c2); }
+  .dots i:nth-child(4) { animation-delay: .42s; background: color-mix(in srgb, var(--c2), var(--c3)); } .dots i:nth-child(5) { animation-delay: .56s; background: var(--c3); }
+  .bar[data-mode="done"] .dots, .bar[data-mode="fail"] .dots { opacity: 0; }
+  @keyframes dot { 0%, 100% { opacity: .18; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
+  #stop { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: #000; color: var(--dim); font-size: 15px; line-height: 1;
+    transition: transform .3s var(--spring), border-color .3s, color .3s; }
+  #stop:active { transform: scale(.88) rotate(90deg); border-color: var(--c1); color: var(--ink); }
+  #textbox { position: relative; margin: 10px 2px 0; }
+  .text { font-size: 17px; min-width: 0; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    transition: opacity .34s ease, transform .46s var(--spring), filter .34s ease; }
+  .text.leaving { position: absolute; inset: 0 0 auto 0; opacity: 0; transform: translateY(-8px); filter: blur(3px); }
+  .text.arriving { opacity: 0; transform: translateY(8px); filter: blur(3px); }
+  .bar[data-mode="asking"] .text { -webkit-line-clamp: 8; }
+  .text q { display: block; quotes: none; margin-top: 6px; padding: 8px 12px; border-left: 2px solid var(--c1); background: #0b0b0d; border-radius: 4px 12px 12px 4px; font-size: 18px; color: #fff; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  /* the quick panel: tiles in a grid, the first (Talk) filled */
+  .btns.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .btns.tiles button { flex: none; min-height: 76px; border-radius: 20px; display: grid; place-items: center; align-content: center; gap: 6px; padding: 8px 4px; font-size: 13px; line-height: 1.15; overflow: hidden; }
+  .btns.tiles button svg { width: 24px; height: 24px; }
+  .btns.tiles button:first-child { background: var(--c1); border-color: var(--c1); color: #000; }
+  .btns.tiles button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btns button { flex: 1 1 42%; }
+  .btns[hidden], .entry[hidden] { display: none; }
+  .btns button, .entry button { position: relative; overflow: hidden; flex: 1; min-height: 48px; border-radius: 24px; border: 1px solid var(--line); background: #000; color: var(--ink);
+    font: 600 16px "Space Grotesk", system-ui, sans-serif; transition: transform .22s var(--spring), border-color .3s, background .3s; }
+  .btns button:active, .entry button:active { transform: scale(.955); }
+  .btns button.yes { background: var(--c1); color: #000; border-color: var(--c1); }
+  .btns button.yes::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%);
+    transform: translateX(-120%); animation: sheen 2.8s ease-in-out 1s infinite; }
+  @keyframes sheen { 0% { transform: translateX(-120%); } 45%, 100% { transform: translateX(120%); } }
+  .entry { display: flex; gap: 8px; margin-top: 12px; }
+  .entry input { flex: 1; min-width: 0; min-height: 48px; border-radius: 24px; border: 1px solid var(--line); background: #0b0b0d; color: var(--ink); padding: 0 16px;
+    font: 16px "Space Grotesk", system-ui, sans-serif; -webkit-user-select: text; user-select: text; transition: border-color .3s; }
+  .entry input:focus { outline: none; border-color: var(--c1); }
+  .entry button { flex: 0 0 auto; padding: 0 20px; background: var(--c1); color: #000; border-color: var(--c1); }
+  #hint { margin: 8px 2px 0; color: var(--dim); font-size: 13px; }
+  #hint:empty { display: none; }
+  .bar.pulse { animation: pulse .7s var(--spring); }
+  @keyframes pulse { 0% { scale: 1; } 40% { scale: 1.018; } 100% { scale: 1; } }
+  .bar.shake { animation: shake .42s ease; }
+  @keyframes shake { 20% { translate: -3px 0; } 40% { translate: 3px 0; } 60% { translate: -2px 0; } 80% { translate: 2px 0; } }
+  @media (prefers-reduced-motion: reduce) { .dots i, #buddy, .bar::before, .btns button.yes::after, .bit { animation: none; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="bar hush" id="bar" data-mode="working"><div class="inner" id="inner">
+    <div class="top">
+      <div id="buddy" aria-hidden="true"></div>
+      <div class="state"><svg id="tick" viewBox="0 0 26 26" aria-hidden="true"><path d="M5 14l5 5 11-12"/></svg><span id="label"></span><span id="step"></span><span class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>
+      <button id="stop" type="button" aria-label="Stop">✕</button>
+    </div>
+    <div id="textbox"><div class="text" id="text" aria-live="polite"></div></div>
+    <div id="hint"></div>
+    <div class="btns" id="btns" hidden></div>
+    <div class="entry" id="entry" hidden><input id="ans" type="text" placeholder="Type, or just say it" autocomplete="off"><button id="ansgo" type="button">Answer</button></div>
+  </div></div>
+</div>
+<script type="module">
+import { mountLive } from "./js/buddy/avatar.js";
+
+const GLOW = { blink: "#ffcc33", void: "#a78bfa", glitch: "#22d3ee", cinder: "#ff7a2f", oracle: "#2dd4bf" };
+const REACT = { listening: "listen", working: "think", asking: "listen", done: "happy", fail: "worried" };
+const LABEL = { listening: "listening", working: "working", asking: "needs you", done: "done", fail: "stopped" };
+const $ = (id) => document.getElementById(id);
+const bridge = window.AgentUi || { answer() {}, resize() {} };
+const bar = $("bar"), inner = $("inner");
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+// the buddy's colour and two neighbours on the colour wheel: the outline and the dots turn through them (one colour when the owner prefers)
+function hues(hex, colorful) {
+  const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+  let h = 0; const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  if (d) h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  h = Math.round(h * 60 + 360) % 360;
+  const hsl = (dh) => `hsl(${(h + dh + 360) % 360} ${Math.round(Math.max(s, .75) * 100)}% ${Math.round(Math.min(Math.max(l, .55), .66) * 100)}%)`;
+  return colorful ? [hex, hsl(-55), hsl(70)] : [hex, hex, hex];
+}
+
+// "To Baba. I wrote: Hi there. Shall I send it?": the message itself is shown as a quote, so it is easy to check before it goes
+function fill(el, text) {
+  el.replaceChildren();
+  const m = /^(.*?)(?:I wrote|The message): ([\s\S]+?)\.? (Shall I \w+ it\?)$/.exec(text);
+  if (!m) { el.textContent = text; return; }
+  el.append(document.createTextNode(m[1].trim() || "The message:"));
+  const q = document.createElement("q"); q.textContent = m[2]; el.append(q);
+  el.append(document.createTextNode(m[3]));
+}
+
+// done: the character hops and a few pieces fly out of it, in the buddy's colours
+function celebrate(c1, c2, c3) {
+  const b = $("buddy"), r = b.getBoundingClientRect(), cols = [c1, c2, c3, "#4ade80", "#fff"];
+  b.classList.remove("hop"); void b.offsetWidth; b.classList.add("hop");
+  for (let i = 0; i < 16; i++) {
+    const e = document.createElement("i"); e.className = "bit";
+    e.style.left = (r.left + r.width / 2) + "px"; e.style.top = (r.top + r.height / 2) + "px"; e.style.background = cols[i % cols.length];
+    e.style.setProperty("--x", (Math.random() * 150 - 20) + "px"); e.style.setProperty("--y", (Math.random() * 70 - 40) + "px"); e.style.setProperty("--r", Math.random() * 600 + "deg");
+    $("wrap").append(e); setTimeout(() => e.remove(), 1000);
+  }
+}
+
+// the state word arrives letter by letter
+let lastLabel = "";
+function label(word) {
+  if (word === lastLabel) return; lastLabel = word;
+  const el = $("label"); el.replaceChildren();
+  [...word].forEach((ch, i) => { const sp = document.createElement("span"); sp.textContent = ch === " " ? " " : ch; sp.style.animationDelay = i * 38 + "ms"; el.append(sp); });
+}
+
+// new words come in from below while the old ones float up and fade
+let lastText = null;
+function setText(text) {
+  if (text === lastText) return;
+  const box = $("textbox"), old = $("text");
+  const next = document.createElement("div"); next.className = "text arriving"; next.setAttribute("aria-live", "polite"); fill(next, text);
+  if (lastText !== null && old && old.textContent) { old.removeAttribute("id"); old.classList.add("leaving"); setTimeout(() => old.remove(), 440); } else if (old) old.remove();
+  next.id = "text"; box.append(next); lastText = text;
+  requestAnimationFrame(() => requestAnimationFrame(() => next.classList.remove("arriving")));
+}
+
+// ---- where the card is: the island (grown out of the camera) or the bar (at the bottom) ----
+let shown = false, layout = "bar", isl = null, queue = Promise.resolve();
+const T = (props, ms, ease) => props.map((p) => `${p} ${ms}ms ${ease}`).join(", ");
+function box(b, ms = 0, ease = "var(--smooth)", props = ["left", "top", "width", "height", "border-radius"]) {
+  bar.style.transition = (ms ? T(props, ms, ease) + ", " : "") + "opacity 320ms ease, transform 760ms var(--spring)";
+  bar.style.left = b.left + "px"; bar.style.top = b.top + "px"; bar.style.width = b.width + "px"; bar.style.height = b.height + "px";
+  if (b.radius !== undefined) bar.style.borderRadius = b.radius + "px";
+}
+function islandGeometry(g) {
+  const W = Math.min(g.sw - 16, 440);
+  const left = Math.max(8, Math.min(g.sw - 8 - W, g.cx - W / 2));
+  const top = Math.max(2, g.top - 5);
+  const padTop = g.notch ? Math.max(12, g.top + g.h - top + 8) : 12;     // the content starts below the camera, whatever its shape
+  inner.style.width = (W - 24) + "px"; inner.style.top = padTop + "px";
+  const H = padTop + inner.scrollHeight + 14;
+  const cam = { left: g.cx - g.w / 2, top: g.top, width: g.w, height: g.h, radius: Math.min(g.w, g.h) / 2 };
+  const pill = { left: g.cx - (g.w + 18) / 2, top: g.top - 4, width: g.w + 18, height: g.h + 8, radius: (g.h + 8) / 2 };
+  const wide = { left, top: pill.top, width: W, height: pill.height, radius: pill.height / 2 };
+  return { H, top, cam, pill, wide, card: { left, top, width: W, height: H, radius: 30 } };
+}
+function barGeometry() {
+  const W = Math.min(innerWidth - 24, 520), left = (innerWidth - W) / 2;
+  inner.style.width = (W - 24) + "px"; inner.style.top = "12px";
+  const H = inner.scrollHeight + 24;
+  return { H, card: { left, top: 40, width: W, height: H, radius: 28 } };
+}
+
+// born: a point at the camera, a black pill round it, stretched sideways, opened downwards into the card, then filled
+async function enterIsland(g) {
+  const k = islandGeometry(g); isl = k;
+  bridge.resize(Math.ceil(k.top + k.H + 30));
+  bar.classList.add("hush", "calm"); bar.style.transform = "none"; box(k.cam); bar.style.opacity = "0";
+  await frame();
+  bar.style.opacity = "1"; box(k.pill, 210, "var(--spring)"); await wait(200);
+  box(k.wide, 340, "var(--smooth)", ["left", "width"]); await wait(300);
+  box(k.card, 400, "var(--spring)", ["height", "border-radius", "top"]); bar.classList.remove("calm"); await wait(200);
+  bar.classList.remove("hush");
+}
+// the bar rises from the bottom edge, then fills
+async function enterBar() {
+  const k = barGeometry();
+  bridge.resize(Math.ceil(k.H + 52));
+  bar.classList.add("hush"); box(k.card); bar.style.transform = "translateY(70px) scale(.96)"; bar.style.opacity = "0";
+  await frame();
+  bar.style.opacity = "1"; bar.style.transform = "none"; await wait(460);
+  bar.classList.remove("hush");
+}
+function refit(g) {
+  if (layout === "island") { const k = islandGeometry(g); isl = k; bridge.resize(Math.ceil(k.top + k.H + 30)); box(k.card, 600, "var(--spring)", ["height", "left", "width"]); }
+  else { const k = barGeometry(); bridge.resize(Math.ceil(k.H + 52)); box(k.card, 600, "var(--spring)", ["height"]); }
+}
+// leaving: emptied, closed back to a pill, drawn into the camera (or sunk to the bottom), gone
+window.agentLeave = () => {
+  queue = queue.then(async () => {
+    if (!shown) return;
+    shown = false;
+    bar.classList.add("hush"); await wait(110);
+    if (layout === "island" && isl) {
+      bar.classList.add("calm");
+      box(isl.wide, 240, "var(--smooth)", ["height", "border-radius", "top"]); await wait(210);
+      box(isl.pill, 240, "var(--smooth)", ["left", "width"]); await wait(210);
+      box(isl.cam, 170, "var(--out)"); bar.style.opacity = "0"; await wait(180);
+    } else {
+      bar.style.transform = "translateY(70px) scale(.96)"; bar.style.opacity = "0"; await wait(480);
+    }
+    lastText = null; lastLabel = ""; isl = null; workText = "";
+  });
+};
+
+let workText = "";
+window.agentUi = (s) => {
+  queue = queue.then(async () => {
+    let mode = s.mode || "working";
+    if (mode === "asking" && !(s.buttons || []).length && !s.input && /listening/i.test(s.text || "")) mode = "listening";
+    const prev = bar.dataset.mode;
+    bar.dataset.mode = mode;
+    const [c1, c2, c3] = hues(GLOW[s.character] || GLOW.blink, s.colorful !== false);
+    const root = document.documentElement.style; root.setProperty("--c1", c1); root.setProperty("--c2", c2); root.setProperty("--c3", c3);
+    label((s.tiles || []).length ? "quick panel" : (LABEL[mode] || mode));
+    // the steps in between (their numbers and what each one does) only when the owner asked to see them (Settings);
+    // otherwise, while it works, the card keeps showing the task itself
+    const isStep = /^step \d+$/.test(s.step || "");
+    let text = s.text || "";
+    if (mode === "working" && isStep && !s.showSteps) text = workText || s.goal || "Working on it.";
+    else if (mode === "working" && !isStep) workText = text.startsWith("“") || !s.goal ? text : s.goal;
+    $("step").textContent = isStep && s.showSteps ? "· " + s.step : "";
+    $("hint").textContent = s.step && !isStep ? s.step : "";
+    setText(text);
+    const btns = $("btns"); btns.replaceChildren();
+    const ICO = { mic: "M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3", chat: "M4 5h16v11H9l-5 4z", timer: "M10 3h4M12 7a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM12 10v4l2 1",
+      cal: "M5 6h14v13H5zM5 10h14M9 4v3M15 4v3", app: "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM11 18h2" };
+    btns.className = (s.tiles || []).length ? "btns tiles" : "btns";
+    for (const t of s.tiles || []) {
+      const el = document.createElement("button"); el.type = "button";
+      el.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICO[t.icon] || ICO.chat}"/></svg><span></span>`;
+      el.querySelector("span").textContent = t.label;
+      el.addEventListener("click", () => bridge.answer(t.id));
+      btns.append(el);
+    }
+    for (const b of s.buttons || []) {
+      const el = document.createElement("button");
+      el.type = "button"; el.textContent = b.label; if (b.id === "yes") el.className = "yes";
+      el.addEventListener("click", () => bridge.answer(b.id));
+      btns.append(el);
+    }
+    btns.hidden = !(s.buttons || []).length && !(s.tiles || []).length;
+    $("entry").hidden = !s.input; if (s.input) $("ans").value = "";
+    mountLive($("buddy"), s.character || "blink", REACT[mode] || "think");
+    const want = s.layout === "island" && s.island ? "island" : "bar";
+    if (!shown || want !== layout) {
+      layout = want; shown = true; bar.dataset.layout = layout;
+      await document.fonts.ready; await frame();
+      if (layout === "island") await enterIsland(s.island); else await enterBar();
+    } else {
+      refit(s.island);
+      if (mode !== prev && mode === "done") { bar.classList.remove("pulse"); void bar.offsetWidth; bar.classList.add("pulse"); celebrate(c1, c2, c3); }
+      if (mode !== prev && mode === "fail") { bar.classList.remove("shake"); void bar.offsetWidth; bar.classList.add("shake"); }
+    }
+  });
+};
+$("stop").addEventListener("click", () => bridge.answer("stop"));
+const sendAnswer = () => { const v = $("ans").value.trim(); if (v) bridge.answer("text:" + v); };
+$("ansgo").addEventListener("click", sendAnswer);
+$("ans").addEventListener("keydown", (e) => { if (e.key === "Enter") sendAnswer(); });
+</script>
+</body>
+</html>

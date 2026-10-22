@@ -1,0 +1,131 @@
+/* Everything below the shared bits is scoped to .lcard: the sections' own
+   stylesheet (sections.css) uses some of the same short names (.cal, .think).
+
+   The live cards (js/buddy/live-cards.js) and the components the screens
+   share: card headings, chips, the Plan / Do / Check pipe, bars, the vinyl
+   player, the calendar and clock. Colours, radius and fonts come from the
+   tokens, so every character's look applies here without a second set. */
+
+.cards { display: grid; gap: var(--s4); grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.c4 { grid-column: span 4; } .c5 { grid-column: span 5; } .c6 { grid-column: span 6; } .c7 { grid-column: span 7; } .c8 { grid-column: span 8; } .c12 { grid-column: span 12; }
+@media (max-width: 980px) { .c4, .c5, .c6, .c7, .c8 { grid-column: span 12; } }
+
+.lcard { background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px;
+  display: grid; gap: 10px; align-content: start; min-width: 0; }
+.lcard h3 { margin: 0; display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 12px;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); }
+.lcard h3 .chip, .lcard h3 .btn { margin-left: auto; letter-spacing: 0; text-transform: none; }
+.lcard .none { margin: 0; color: var(--text-2); font-size: var(--fs-small); }
+.lcard .none.err { color: var(--bad); }
+.chip.on { background: var(--accent); border-color: transparent; color: var(--accent-ink); }
+.chip.ok { background: color-mix(in srgb, var(--ok) 20%, transparent); border-color: transparent; color: var(--ok); }
+.btn.small { min-height: 30px; padding: 0 12px; font-size: var(--fs-caption); text-decoration: none; }
+.grow { flex: 1; min-width: 0; }
+
+/* the PC strip */
+.pcs { display: flex; gap: 8px; flex-wrap: wrap; }
+.pcs span { background: var(--surface-2); border-radius: var(--radius-sm); padding: 6px 11px; font-size: 11px; color: var(--text-3);
+  font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.pcs b { display: block; font-size: 16px; color: var(--text); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.pcs .bad b { color: var(--bad); }
+
+/* the job in progress */
+.lcard .wk { display: flex; gap: 12px; align-items: center; }
+.lcard .appic { flex: none; position: relative; width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center;
+  font-family: var(--display); font-weight: 800; font-size: 21px; color: #fff; background: var(--surface-3); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .2); }
+.lcard .appic.real { box-shadow: none; }
+.lcard .appic img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.lcard .appic.run::after { content: ""; position: absolute; inset: -4px; border-radius: 17px; border: 2px solid var(--accent); animation: lc-ring 1.4s ease-out infinite; }
+.lcard .wk-app { font-size: 12px; color: var(--text-3); font-weight: 800; text-transform: uppercase; letter-spacing: .04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lcard .wk-task { font-family: var(--display); font-weight: 800; font-size: 17px; line-height: 1.25; overflow-wrap: anywhere; }
+.lcard .wk-pct { font-family: var(--display); font-weight: 800; font-size: 24px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lcard .wk-pct.small { font-size: 13px; color: var(--text-2); }
+.lcard .pipe { display: flex; gap: 6px; }
+.lcard .pipe span { flex: 1; text-align: center; font-family: var(--display); font-weight: 800; font-size: 11px; padding: 5px 0; border-radius: 99px;
+  background: var(--surface-2); color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; }
+.lcard .pipe span.on { background: var(--accent); color: var(--accent-ink); box-shadow: 0 0 14px var(--accent); animation: lc-beat 1s ease-in-out infinite; }
+.lcard .pipe span.ok { color: var(--text); background: var(--surface-3); }
+.lcard .think { color: var(--text-2); font-style: italic; font-size: 13px; min-height: 1.4em; overflow-wrap: anywhere; }
+.lcard .think.typing::after { content: "..."; animation: lc-type 1.2s steps(4) infinite; }
+.lcard .prog { position: relative; height: 12px; background: rgba(0, 0, 0, .45); border-radius: 99px; overflow: hidden; }
+.lcard .prog i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--accent), rgba(255, 255, 255, .5));
+  box-shadow: 0 0 14px var(--accent); transition: width .6s cubic-bezier(.3, 1.3, .5, 1); }
+/* progress not known: a light sweeps along the bar; no number is shown */
+.lcard .prog.shimmer::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; border-radius: 99px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent); animation: lc-sweep 1.5s ease-in-out infinite; }
+.done .prog i { background: linear-gradient(90deg, var(--ok), rgba(255, 255, 255, .5)); box-shadow: 0 0 14px var(--ok); }
+.fail .prog i { background: linear-gradient(90deg, var(--bad), rgba(255, 255, 255, .5)); box-shadow: none; }
+@keyframes lc-ring { 0% { transform: scale(.85); opacity: .9; } 100% { transform: scale(1.25); opacity: 0; } }
+@keyframes lc-beat { 50% { transform: scale(1.05); } }
+@keyframes lc-type { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+@keyframes lc-sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+
+/* the player */
+.music { display: grid; gap: 10px; }
+.lcard .deck { display: flex; gap: 16px; align-items: center; position: relative; }
+.lcard .disc { position: relative; width: 104px; height: 104px; flex: none; }
+.lcard .vinyl { position: relative; width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center;
+  background: repeating-radial-gradient(circle, #08080b 0 2px, #22232b 2px 3px); animation: lc-spin 2.4s linear infinite;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .6), 0 0 30px color-mix(in srgb, var(--accent) 40%, transparent); }
+.lcard .vinyl::before { content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 20deg, transparent 0 20%, rgba(255, 255, 255, .16) 25%, transparent 30% 70%, rgba(255, 255, 255, .13) 75%, transparent 80%); }
+.lcard .vinyl i { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .33), transparent 40%), conic-gradient(var(--accent), #ff6a9a, #6a8bff, var(--accent)); }
+.lcard .vinyl i::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #0d0d10; }
+.lcard .vinyl.stop { animation-play-state: paused; }
+.lcard .arm { position: absolute; left: 86px; top: -6px; width: 5px; height: 58px; border-radius: 3px; background: linear-gradient(90deg, #8a8f9a, #e8eaee);
+  transform-origin: 50% 4px; transform: rotate(28deg); transition: transform .5s cubic-bezier(.3, 1.4, .5, 1); }
+.lcard .arm.off { transform: rotate(-8deg); }
+.lcard .trk { min-width: 0; flex: 1; display: grid; gap: 4px; }
+.lcard .trk b { font-family: var(--display); font-weight: 800; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lcard .trk span { color: var(--text-2); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lcard .eqb { display: flex; gap: 3px; align-items: flex-end; height: 22px; }
+.lcard .eqb i { width: 4px; border-radius: 2px; background: var(--accent); animation: lc-eq .8s ease-in-out infinite; }
+.lcard .eqb i:nth-child(2n) { animation-duration: .6s; } .eqb i:nth-child(3n) { animation-duration: 1s; }
+.lcard .eqb.stop i { animation-play-state: paused; }
+.lcard .mp { position: relative; height: 6px; background: rgba(0, 0, 0, .45); border-radius: 9px; }
+.lcard .mp i { position: relative; display: block; height: 100%; width: 0; background: var(--accent); border-radius: 9px; }
+.lcard .mp i::after { content: ""; position: absolute; right: -5px; top: -3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px var(--accent); }
+.lcard .tt { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.lcard .row2 { display: flex; gap: 8px; }
+.lcard .row2 .btn { flex: 1; }
+@keyframes lc-spin { to { transform: rotate(360deg); } }
+@keyframes lc-eq { 0%, 100% { height: 4px; } 50% { height: 22px; } }
+
+/* reminders: the month, the clock, the list */
+.lcard .frm { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 8px; }
+.lcard .frm .none { grid-column: 1 / -1; }
+@media (max-width: 700px) { .frm { grid-template-columns: minmax(0, 1fr); } }
+.lcard .calrow { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.lcard .calh { font-family: var(--display); font-weight: 800; font-size: 14px; margin-bottom: 6px; }
+.lcard .cal { display: grid; grid-template-columns: repeat(7, 26px); gap: 3px; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.lcard .cal span { position: relative; height: 26px; display: grid; place-items: center; border-radius: 8px; color: var(--text-2); }
+.lcard .cal .d { color: var(--text-3); font-size: 10.5px; }
+.lcard .cal .today { outline: 1.5px solid var(--line-strong); }
+.lcard .cal .ev { background: var(--accent-soft); color: var(--accent-text); }
+.lcard .cal .hit { background: var(--accent); color: var(--accent-ink); animation: lc-hit .6s cubic-bezier(.2, 1.8, .4, 1) both; }
+.lcard .cal .hit::after { content: ""; position: absolute; inset: -3px; border-radius: 11px; border: 2px solid var(--accent); animation: lc-splash .9s ease-out both; }
+@keyframes lc-hit { 0% { transform: scale(.2); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+@keyframes lc-splash { 0% { transform: scale(.6); opacity: 1; } 100% { transform: scale(2.6); opacity: 0; } }
+.lcard .clock { width: 84px; height: 84px; flex: none; }
+.lcard .clock circle { fill: rgba(0, 0, 0, .5); stroke: var(--text-3); stroke-width: 2; }
+.lcard .clock line { stroke: var(--text); stroke-width: 3; stroke-linecap: round; transform-origin: 30px 30px; transition: transform 1.1s cubic-bezier(.3, 1.5, .5, 1); }
+.lcard .clock .mh { stroke: var(--accent); stroke-width: 2; }
+.lcard .clock .pin { fill: var(--accent); stroke: none; }
+.lcard .clock .ticks line { stroke: var(--text-3); stroke-width: 1.5; transition: none; }
+.lcard .rems { display: grid; gap: 6px; flex: 1; min-width: 240px; align-content: start; }
+.lcard .rem { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border-radius: var(--radius-sm); padding: 8px 12px; }
+.lcard .rem b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lcard .rem span { color: var(--text-2); flex: 1; min-width: 0; overflow-wrap: anywhere; }
+
+/* progress card (home): level ring, streak, badges, the latest awards */
+.prog { display: flex; align-items: center; gap: 14px; margin: 6px 0 10px; }
+.prog-ring { position: relative; width: 64px; height: 64px; border-radius: 50%; flex: none; display: grid; place-items: center; text-align: center;
+  background: conic-gradient(var(--bac, #ffc933) calc(var(--p, 0) * 360deg), var(--line, #2b2f36) 0); }
+.prog-ring::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--surface, #14161a); }
+.prog-ring b, .prog-ring small { position: relative; line-height: 1; }
+.prog-ring b { font-size: 20px; margin-top: 12px; }
+.prog-ring small { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; margin-top: -14px; }
+.prog-body { display: grid; gap: 3px; font-size: 13px; min-width: 0; }
+.prog-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.prog-badges .chip.off { opacity: .45; }

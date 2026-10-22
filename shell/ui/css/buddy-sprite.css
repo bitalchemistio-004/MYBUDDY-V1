@@ -1,0 +1,179 @@
+/* The floating buddy's window. The character stands alone in its corner of
+   the window, with no container around it; what it says and what it is
+   working on extend out beside it and retract again. The window is exactly
+   as large as what is drawn (buddy.js measures this and asks the shell), so
+   everything here is laid out from the character's own corner: a bubble that
+   appears makes the window grow away from the character, which stays put.
+
+   --sprite-w / --sprite-h come from buddy.js (the 320x240 art at about half
+   size). --pad is the only empty space: room for the character's shadow and
+   the effects around it. */
+
+html, body { background: transparent !important; overflow: hidden; }
+body { margin: 0; width: 100vw; height: 100vh; user-select: none; font-family: var(--font);
+  --pad: 14px; --gap: 10px;
+  --spring: cubic-bezier(.34, 1.4, .64, 1); --glide: cubic-bezier(.2, .8, .2, 1);
+  /* each character's own colours (the same tokens its panel uses) */
+  --bbg: #0e0e10; --btx: #f5f3ee; --bln: #2c2c31; --bac: #ffcc33; }
+body[data-c="void"] { --bbg: #160f34; --btx: #efe9ff; --bln: #3a2a78; --bac: #b68cff; }
+body[data-c="glitch"] { --bbg: #06121a; --btx: #dffbff; --bln: #19e6ff; --bac: #19e6ff; }
+body[data-c="cinder"] { --bbg: #221510; --btx: #ffeede; --bln: #6b2b12; --bac: #ff7a2f; }
+body[data-c="oracle"] { --bbg: #181538; --btx: #f6efdb; --bln: #f2c14e; --bac: #f2c14e; }
+[hidden] { display: none !important; }
+
+/* ---------- the character ---------- */
+.stage { position: absolute; bottom: var(--pad); width: var(--sprite-w, 160px); height: var(--sprite-h, 120px); cursor: grab; }
+body.right .stage { right: var(--pad); }
+body.left .stage { left: var(--pad); }
+.sprite-wrap { position: relative; width: 100%; height: 100%; transform-origin: 50% 100%; transition: translate .35s var(--spring); }
+canvas.sprite { position: relative; z-index: 1; display: block; width: 100%; height: 100%;
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, .35)); }
+.sprite-wrap.drop { animation: land .5s var(--spring); }
+@keyframes land { 0% { scale: 1 1; } 30% { scale: 1.06 .92; } 65% { scale: .98 1.03; } 100% { scale: 1 1; } }
+/* a cut to another clip: the character pops into the new pose */
+canvas.sprite.pop { animation: cut .22s cubic-bezier(.2, 1.6, .4, 1); transform-origin: 50% 100%; }
+@keyframes cut { 0% { transform: scale(.92, .88); } 60% { transform: scale(1.03, 1.05); } 100% { transform: none; } }
+/* asleep: the art itself is see-through, so the desktop shows behind it.
+   A shadow under see-through art would read as a dark backing, so it goes. */
+body[data-clip="sleep"] canvas.sprite { filter: none; }
+
+/* ---------- aura: light effects around the character, behind the frames ----------
+   Everything stays inside the character's box plus --pad. */
+.aura { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.aura > * { position: absolute; }
+.aura .ring { inset: 6%; border-radius: 50%; border: 3px solid var(--aa); opacity: 0; }
+.a-work .ring { opacity: .9; border-color: rgba(255, 255, 255, .13); border-top-color: var(--aa); border-right-color: var(--aa);
+  animation: aura-orbit 1.6s linear infinite; }
+.a-work .ring.r2 { inset: 0; animation-duration: 2.6s; animation-direction: reverse; opacity: .5; border-width: 2px; }
+.a-focus .ring { opacity: .75; border-color: rgba(255, 255, 255, .1); border-top-color: var(--aa); animation: aura-orbit 4s linear infinite; }
+.aura .dot { width: 8px; height: 8px; margin: -4px; left: 50%; top: 50%; border-radius: 50%; background: var(--aa);
+  box-shadow: 0 0 8px var(--aa); animation: aura-dot 2.2s linear infinite; }
+.aura .dot:nth-child(4) { animation-delay: -.7s; } .aura .dot:nth-child(5) { animation-delay: -1.4s; }
+.aura .wave { inset: 14%; border-radius: 50%; border: 2px solid var(--aa); opacity: 0; animation: aura-wave 1.6s ease-out infinite; }
+.aura .wave.w2 { animation-delay: .53s; } .aura .wave.w3 { animation-delay: 1.06s; }
+.a-alert .wave { border-width: 3px; }
+.aura .eq { left: 50%; bottom: -10px; transform: translateX(-50%); display: flex; gap: 4px; align-items: flex-end; height: 30px; }
+.aura .eq i { width: 5px; border-radius: 3px; background: linear-gradient(var(--aa), rgba(255, 255, 255, .55)); animation: aura-eq .9s ease-in-out infinite; }
+.aura .eq i:nth-child(2n) { animation-duration: .7s; } .aura .eq i:nth-child(3n) { animation-duration: 1.1s; } .aura .eq i:nth-child(4n) { animation-duration: .6s; }
+.aura .note { top: 40%; font-size: 20px; font-weight: 800; color: var(--aa); text-shadow: 0 0 8px var(--aa); opacity: 0; animation: aura-note 2.4s ease-out infinite; }
+.aura .glow { inset: calc(var(--pad) * -1 + 2px); border-radius: 50%; background: radial-gradient(circle, var(--aa) 0, transparent 66%); filter: blur(5px);
+  opacity: .55; animation: aura-mad .5s ease-in-out infinite alternate; }
+.aura .spark { width: 8px; height: 8px; left: 50%; top: 45%; margin: -4px; border-radius: 2px; background: var(--c); animation: aura-burst 1s cubic-bezier(.1, .8, .3, 1) forwards; }
+@keyframes aura-orbit { to { transform: rotate(360deg); } }
+/* an ellipse the shape of the character's box, so the dots never leave it */
+@keyframes aura-dot {
+  0% { transform: translate(calc(var(--aw) * .46), 0); } 25% { transform: translate(0, calc(var(--ah) * .46)); }
+  50% { transform: translate(calc(var(--aw) * -.46), 0); } 75% { transform: translate(0, calc(var(--ah) * -.46)); }
+  100% { transform: translate(calc(var(--aw) * .46), 0); } }
+@keyframes aura-wave { 0% { transform: scale(.5); opacity: .85; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes aura-eq { 0%, 100% { height: 5px; } 50% { height: 28px; } }
+@keyframes aura-note { 0% { transform: translate(0, 8px) rotate(-10deg); opacity: 0; } 15% { opacity: 1; }
+  100% { transform: translate(var(--dx), calc(var(--rise) * -1)) rotate(14deg); opacity: 0; } }
+@keyframes aura-mad { to { opacity: .25; transform: scale(1.04); } }
+@keyframes aura-burst { to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }
+
+/* ---------- beside the character: what it says, what it works on ---------- */
+.side { position: absolute; bottom: var(--pad); display: flex; flex-direction: column; gap: 8px; width: max-content; max-width: 250px; }
+body.right .side { right: calc(var(--pad) + var(--sprite-w, 160px) + var(--gap)); align-items: flex-end; }
+body.left .side { left: calc(var(--pad) + var(--sprite-w, 160px) + var(--gap)); align-items: flex-start; }
+/* each one extends out from the character's side and retracts into it */
+.side > * { opacity: 0; transform: scale(.55); transition: transform .32s cubic-bezier(.2, 1.5, .4, 1), opacity .16s; }
+.side > .show { opacity: 1; transform: none; }
+body.right .side > * { transform-origin: 100% 70%; }
+body.left .side > * { transform-origin: 0 70%; }
+
+/* what it says */
+.talk { position: relative; box-sizing: border-box; width: max-content; max-width: 250px; padding: 9px 13px; border-radius: 16px;
+  background: var(--bbg); color: var(--btx); border: 1px solid var(--bln); box-shadow: 0 4px 10px rgba(0, 0, 0, .35);
+  font-size: 13.5px; line-height: 1.4; font-weight: 500; cursor: pointer; }
+.talk small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--bac); margin-bottom: 1px; }
+.talk span { overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+.talk.ring { animation: talk-ring 1.2s var(--glide) 2; }
+@keyframes talk-ring { 0% { box-shadow: 0 0 0 0 var(--bac), 0 4px 10px rgba(0, 0, 0, .35); } 100% { box-shadow: 0 0 0 9px transparent, 0 4px 10px rgba(0, 0, 0, .35); } }
+
+/* a question with its answers: a reminder that fired, a check-in */
+.act { position: relative; box-sizing: border-box; width: 250px; display: grid; gap: 7px; padding: 10px 12px; border-radius: 16px;
+  background: var(--bbg); color: var(--btx); border: 1px solid var(--bac); box-shadow: 0 4px 10px rgba(0, 0, 0, .35); }
+.act small { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--bac); }
+.act p { margin: 0; font-size: 13.5px; line-height: 1.4; font-weight: 600; overflow-wrap: anywhere; }
+.act .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.act button { flex: 1; min-height: 30px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--bln); background: rgba(255, 255, 255, .07);
+  color: var(--btx); font: 800 12px var(--font); cursor: pointer; white-space: nowrap; }
+.act button:hover { border-color: var(--bac); }
+.act button.go { background: var(--bac); border-color: var(--bac); color: var(--bbg); }
+.act button:focus-visible { outline: 2px solid var(--bac); outline-offset: 2px; }
+.act button:disabled { opacity: .5; cursor: default; }
+
+/* the job in progress */
+.bub { position: relative; box-sizing: border-box; width: 250px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; padding: 10px 12px;
+  border-radius: 16px; background: var(--bbg); color: var(--btx); border: 1px solid var(--bln);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .35); cursor: pointer; }
+/* the tail points at the character from the lowest bubble showing (buddy.js) */
+.side > .tail::before { content: ""; position: absolute; bottom: 14px; width: 10px; height: 10px; background: var(--bbg); transform: rotate(45deg); }
+body.right .side > .tail::before { right: -6px; border-right: 1px solid var(--bln); border-top: 1px solid var(--bln); }
+body.left .side > .tail::before { left: -6px; border-left: 1px solid var(--bln); border-bottom: 1px solid var(--bln); }
+
+.bub .bh { display: flex; gap: 10px; align-items: center; }
+.bub .bi { flex: none; position: relative; width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center;
+  font-weight: 800; font-size: 18px; color: #fff; background: #4a5470; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .2); }
+.bub .bi.real { box-shadow: none; }
+.bub .bi img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.bub .bi.run::after { content: ""; position: absolute; inset: -4px; border-radius: 15px; border: 2px solid var(--bac);
+  animation: bub-ring 1.4s ease-out infinite; }
+.bub .bt { min-width: 0; flex: 1; }
+.bub .bt small { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; opacity: .65;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bub .bt b { font-size: 14px; font-weight: 800; line-height: 1.25; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.bub .bp { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bub .bp.small { font-size: 11px; font-weight: 700; opacity: .7; }
+.bub .bth { font-size: 12.5px; font-style: italic; line-height: 1.35; opacity: .85; min-height: 1.3em; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.bub .bth.typing::after { content: "..."; animation: bub-type 1.2s steps(4) infinite; }
+.bub .bb { position: relative; height: 7px; background: rgba(0, 0, 0, .5); border-radius: 9px; overflow: hidden; }
+.bub .bb i { display: block; height: 100%; width: 0; border-radius: 9px; background: linear-gradient(90deg, var(--bac), rgba(255, 255, 255, .55));
+  transition: width .5s cubic-bezier(.3, 1.3, .5, 1); }
+/* progress not known: a light sweeps along the bar; no number is shown */
+.bub .bb.shimmer::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; border-radius: 9px;
+  background: linear-gradient(90deg, transparent, var(--bac), transparent); animation: bub-sweep 1.5s ease-in-out infinite; }
+.bub .bs { display: flex; gap: 4px; }
+.bub .bs span { flex: 1; height: 4px; border-radius: 3px; background: rgba(255, 255, 255, .11); }
+.bub .bs span.on { background: var(--bac); animation: bub-beat 1s ease-in-out infinite; }
+.bub .bs span.ok { background: rgba(255, 255, 255, .4); }
+.bub.done .bb i { background: linear-gradient(90deg, #34c759, rgba(255, 255, 255, .55)); }
+.bub.done .bs span { background: #34c759; }
+.bub.fail .bb i { background: linear-gradient(90deg, #ff7a59, rgba(255, 255, 255, .55)); }
+@keyframes bub-ring { 0% { transform: scale(.8); opacity: .85; } 100% { transform: scale(1.25); opacity: 0; } }
+@keyframes bub-type { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+@keyframes bub-sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+@keyframes bub-beat { 50% { transform: scaleY(1.6); } }
+
+/* hearing you / thinking: a small capsule when nothing else is showing */
+.cap { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 13px;
+  background: var(--bbg); color: var(--btx); border: 1px solid var(--bln); box-shadow: 0 4px 10px rgba(0, 0, 0, .35); }
+/* sound bars: follow the live voice level */
+.bars { display: none; align-items: center; gap: 3px; height: 16px; }
+.bars i { display: block; width: 3px; height: 16px; border-radius: 2px; background: var(--bac);
+  transform: scaleY(calc(.25 + var(--lvl, 0) * var(--k, 1))); transition: transform .12s linear; }
+.bars i:nth-child(1) { --k: .55; } .bars i:nth-child(2) { --k: .9; } .bars i:nth-child(3) { --k: .75; } .bars i:nth-child(4) { --k: 1; } .bars i:nth-child(5) { --k: .6; }
+body.listening .bars { display: flex; }
+.dots { display: none; gap: 4px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; animation: dot 1.1s var(--glide) infinite; }
+.dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes dot { 0%, 100% { transform: translateY(0); opacity: .45; } 40% { transform: translateY(-4px); opacity: 1; } }
+body.thinking:not(.listening) .dots { display: flex; }
+
+/* a debug outline of the window's own rectangle (?outline), to check that it
+   is no larger than what is drawn */
+body.outline { outline: 1px dashed #ff3cc8; outline-offset: -1px; }
+
+/* reduced motion: no lag, no squash, no pops, no effects; things just appear */
+[data-motion="reduced"] .aura { display: none; }
+[data-motion="reduced"] .sprite-wrap, [data-motion="reduced"] .side > * { transition: none; }
+[data-motion="reduced"] .sprite-wrap.drop, [data-motion="reduced"] canvas.sprite.pop, [data-motion="reduced"] .talk.ring,
+[data-motion="reduced"] .bub *, [data-motion="reduced"] .bub *::after, [data-motion="reduced"] .dots i { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .aura { display: none; }
+  .sprite-wrap, .side > * { transition: none; }
+  .sprite-wrap.drop, canvas.sprite.pop, .talk.ring, .bub *, .bub *::after, .dots i { animation: none !important; }
+}

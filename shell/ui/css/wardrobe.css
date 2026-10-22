@@ -1,0 +1,25 @@
+/* What Blink wears: glowing single lines drawn over the sprite (js/buddy/wardrobe.js). The layers use the art's own
+   320 x 240 coordinates, so the notch's crop and scale carry them with the character. */
+.wd-lay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.wd-lay .itm { filter: drop-shadow(0 0 3px var(--wd-ink, #fff)); }
+.wd-lay .dl { fill: none; stroke: var(--wd-ink, #fff); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.wd-lay .df { fill: var(--wd-ink, #fff); stroke: none; }
+.wd-lay .dk { fill: rgba(0, 0, 0, .78); stroke: var(--wd-ink, #fff); stroke-width: 3; stroke-linejoin: round; }
+.wd-lay .a-tw, .wd-lay .a-steam { animation: wd-tw 1.8s ease-in-out infinite; }
+.wd-lay .a-rise { animation: wd-rise 2.8s ease-out infinite; }
+.wd-lay .a-orb { transform-origin: 0 0; animation: wd-orb 7s linear infinite; }
+@keyframes wd-tw { 0%, 100% { opacity: .25 } 50% { opacity: 1 } }
+@keyframes wd-rise { 0% { transform: translateY(10px); opacity: 0 } 40% { opacity: 1 } 100% { transform: translateY(-16px); opacity: 0 } }
+@keyframes wd-orb { to { transform: rotate(360deg) } }
+/* the character's own look (a finish): a filter on the sprite, never a different drawing */
+.sprite-wrap[data-wd-finish="ink"] canvas.sprite { filter: grayscale(1) contrast(1.6) brightness(.95) !important; }
+.sprite-wrap[data-wd-finish="neon"] canvas.sprite { filter: drop-shadow(0 0 7px var(--wd-cc, #fff)) saturate(1.4) !important; }
+.sprite-wrap[data-wd-finish="pastel"] canvas.sprite { filter: saturate(.55) brightness(1.5) contrast(.85) !important; }
+.sprite-wrap[data-wd-finish="gold"] canvas.sprite { filter: sepia(1) saturate(3) hue-rotate(-12deg) brightness(1.1) !important; }
+.sprite-wrap[data-wd-finish="holo"] canvas.sprite { animation: wd-holo 5s linear infinite; }
+@keyframes wd-holo { to { filter: hue-rotate(360deg) saturate(1.5) } }
+/* pixel art: square pixels, the item's colour in four tones (the fills are on the rectangles), no glow */
+.wd-lay .itm.px { filter: none; }
+.wd-lay .itm.px use { shape-rendering: crispEdges; }
+[data-motion="reduced"] .wd-lay * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .wd-lay *, .sprite-wrap[data-wd-finish="holo"] canvas.sprite { animation: none !important; } }

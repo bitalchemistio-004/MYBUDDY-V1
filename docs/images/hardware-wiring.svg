@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="470" viewBox="0 0 860 470" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title>MBUDDY desk device wiring: ESP32-S3 to OLED, I2S microphone and I2S speaker amplifier</title>
+  <rect x="0" y="0" width="860" height="470" rx="16" fill="#0b0b0d"/>
+  <!-- the board -->
+  <rect x="320" y="80" width="220" height="310" rx="14" fill="#16161a" stroke="#ffcc33" stroke-width="2"/>
+  <text x="430" y="118" fill="#ffcc33" font-size="20" font-weight="700" text-anchor="middle">ESP32-S3</text>
+  <text x="430" y="140" fill="#9a9aa3" font-size="12" text-anchor="middle">WROOM-1 N16R8</text>
+  <text x="430" y="156" fill="#9a9aa3" font-size="12" text-anchor="middle">16 MB flash · 8 MB PSRAM</text>
+  <!-- pins on the board -->
+  <g font-size="13" fill="#f5f3ee">
+    <text x="335" y="200">GPIO 8  SDA</text>
+    <text x="335" y="222">GPIO 9  SCL</text>
+    <text x="525" y="200" text-anchor="end">SCK  GPIO 16</text>
+    <text x="525" y="222" text-anchor="end">WS  GPIO 17</text>
+    <text x="525" y="244" text-anchor="end">SD  GPIO 18</text>
+    <text x="525" y="300" text-anchor="end">BCLK  GPIO 5</text>
+    <text x="525" y="322" text-anchor="end">LRC  GPIO 4</text>
+    <text x="525" y="344" text-anchor="end">DIN  GPIO 6</text>
+    <text x="335" y="300">GPIO 2  LED</text>
+    <text x="335" y="344">5V · GND</text>
+  </g>
+  <!-- OLED -->
+  <rect x="40" y="160" width="200" height="100" rx="10" fill="#16161a" stroke="#22d3ee" stroke-width="2"/>
+  <text x="140" y="192" fill="#22d3ee" font-size="16" font-weight="700" text-anchor="middle">OLED 128×64</text>
+  <text x="140" y="212" fill="#9a9aa3" font-size="12" text-anchor="middle">I2C · SH1106 / SSD1306</text>
+  <rect x="98" y="222" width="84" height="26" rx="4" fill="#000" stroke="#2b2b2b"/>
+  <ellipse cx="122" cy="235" rx="9" ry="7" fill="#f5f3ee"/><ellipse cx="158" cy="235" rx="9" ry="7" fill="#f5f3ee"/>
+  <path d="M240 196 H330" stroke="#22d3ee" stroke-width="2.5" fill="none"/>
+  <path d="M240 218 H330" stroke="#22d3ee" stroke-width="2.5" fill="none"/>
+  <!-- microphone -->
+  <rect x="620" y="160" width="200" height="100" rx="10" fill="#16161a" stroke="#4ade80" stroke-width="2"/>
+  <text x="720" y="198" fill="#4ade80" font-size="16" font-weight="700" text-anchor="middle">Microphone</text>
+  <text x="720" y="218" fill="#9a9aa3" font-size="12" text-anchor="middle">I2S MEMS · INMP441</text>
+  <text x="720" y="236" fill="#9a9aa3" font-size="12" text-anchor="middle">16 kHz to the brain</text>
+  <path d="M530 196 H620" stroke="#4ade80" stroke-width="2.5" fill="none"/>
+  <path d="M530 218 H620" stroke="#4ade80" stroke-width="2.5" fill="none"/>
+  <path d="M530 240 H620" stroke="#4ade80" stroke-width="2.5" fill="none"/>
+  <!-- speaker -->
+  <rect x="620" y="285" width="200" height="90" rx="10" fill="#16161a" stroke="#ff7a2f" stroke-width="2"/>
+  <text x="720" y="318" fill="#ff7a2f" font-size="16" font-weight="700" text-anchor="middle">Speaker amp</text>
+  <text x="720" y="338" fill="#9a9aa3" font-size="12" text-anchor="middle">I2S · MAX98357A</text>
+  <text x="720" y="356" fill="#9a9aa3" font-size="12" text-anchor="middle">→ 4–8 Ω speaker</text>
+  <path d="M530 296 H620" stroke="#ff7a2f" stroke-width="2.5" fill="none"/>
+  <path d="M530 318 H620" stroke="#ff7a2f" stroke-width="2.5" fill="none"/>
+  <path d="M530 340 H620" stroke="#ff7a2f" stroke-width="2.5" fill="none"/>
+  <!-- power and wifi -->
+  <rect x="40" y="300" width="200" height="70" rx="10" fill="#16161a" stroke="#a78bfa" stroke-width="2"/>
+  <text x="140" y="330" fill="#a78bfa" font-size="16" font-weight="700" text-anchor="middle">5 V USB, 2 A</text>
+  <text x="140" y="350" fill="#9a9aa3" font-size="12" text-anchor="middle">power for all of it</text>
+  <path d="M240 340 H330" stroke="#a78bfa" stroke-width="2.5" fill="none"/>
+  <text x="430" y="420" fill="#9a9aa3" font-size="13" text-anchor="middle">Wi-Fi → WebSocket /ws → the MBUDDY brain on your PC</text>
+  <text x="430" y="50" fill="#f5f3ee" font-size="18" font-weight="600" text-anchor="middle">The desk device, wired</text>
+</svg>

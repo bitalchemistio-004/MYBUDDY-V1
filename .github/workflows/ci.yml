@@ -1,0 +1,43 @@
+# What runs on every push and pull request: the phone app's page tests, the Android unit tests, and a debug build.
+# (Written to match how the project builds on a PC; its first run on GitHub is the check that it also works there.)
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  page:
+    name: Page tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --test shell/ui/tests/*.test.mjs
+
+  android:
+    name: Android build and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      # The Ubuntu runner already has the Android SDK (ANDROID_HOME). Accept its licences so Gradle can fetch any missing platform.
+      - name: Accept Android SDK licences
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+      - uses: gradle/actions/setup-gradle@v4        # caches Gradle and its downloads between runs
+      - name: Unit tests and a debug build
+        working-directory: android
+        run: ./gradlew --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug
+      # The APK is ~68 MB: kept on main only, and for 3 days (at 90 days every push used the account's Actions storage).
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          name: mbuddy-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn
+          retention-days: 3

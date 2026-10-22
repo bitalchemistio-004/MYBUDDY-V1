@@ -1,0 +1,47 @@
+name: Bug report
+description: Something does not work the way it should
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. Please do **not** put keys, tokens or private messages in a report.
+        For a security problem, do not open an issue: see SECURITY.md.
+  - type: dropdown
+    id: part
+    attributes:
+      label: Which part?
+      options: [Phone app (Android), PC app (Windows), Desk device (ESP32), Documentation, Not sure]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open ...\n2. Tap ...\n3. See ..."
+  - type: input
+    id: device
+    attributes:
+      label: Device and system
+      description: "Phone or PC model, Android or Windows version"
+      placeholder: "Redmi Note 12, Android 15 (HyperOS)"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: "Android: Settings > Apps > MBUDDY (the number like 0.1.399). PC: shown in the app's Settings."
+  - type: textarea
+    id: log
+    attributes:
+      label: Problems log (optional)
+      description: "Phone: Settings, Your data, Problems log, Copy the log. It stays on your device unless you paste it here."
+      render: text

@@ -1,0 +1,44 @@
+/* The phone tools page: the same black and one glow colour as the app, big touch targets, one column. */
+@font-face { font-family: "NSpace"; src: url("../assets/fonts/spacegrotesk.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "NDoto"; src: url("../assets/fonts/doto.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root { --bg: #000; --fg: #f5f3ee; --dim: #a7a7ae; --line: #2b2b31; --accent: #ffcc33; --ok: #34c759; --bad: #ff4a2e; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.45 "NSpace", system-ui, sans-serif; }
+body { padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); max-width: 640px; margin: 0 auto; }
+.top { display: flex; flex-wrap: wrap; gap: 10px 12px; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.top > div { flex: 1 1 240px; min-width: 0; }
+h1 { margin: 0; font: 800 30px/1.1 "NDoto", "NSpace", sans-serif; text-transform: uppercase; }
+h2 { margin: 0 0 8px; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.sub, .muted { color: var(--dim); font-size: 14px; margin: 4px 0 0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); border-radius: 99px; padding: 6px 12px; font-size: 13px; white-space: nowrap; }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); }
+.chip.ok { border-color: var(--ok); } .chip.ok .dot { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+.chip.warn { border-color: var(--accent); } .chip.warn .dot { background: var(--accent); }
+section { border: 1.5px solid var(--line); border-radius: 18px; padding: 14px; margin-bottom: 14px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 380px) { .grid { grid-template-columns: 1fr; } }
+button, .act, input, select { font: inherit; color: var(--fg); }
+button, .act { min-height: 44px; border-radius: 14px; border: 1.5px solid var(--line); background: transparent; padding: 0 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; text-align: center; }
+button:active, .act:active { transform: scale(.97); }
+button.go, .act.go { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+button:disabled, .act.off { opacity: .45; pointer-events: none; }
+input, select { width: 100%; min-height: 44px; border-radius: 14px; border: 1.5px solid var(--line); background: #0b0b0d; padding: 0 12px; color-scheme: dark; }
+input:focus { outline: none; border-color: var(--accent); }
+label { display: grid; gap: 4px; font-size: 13px; color: var(--dim); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.row > input { flex: 1; min-width: 0; }
+.stack { display: grid; gap: 10px; }
+.tile { border: 1.5px solid var(--line); border-radius: 14px; padding: 10px; display: grid; gap: 8px; }
+.tile b { font-size: 15px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.result { margin-top: 10px; display: grid; gap: 8px; }
+.result .act { justify-content: flex-start; text-align: left; border-color: var(--accent); }
+.note { font-size: 13px; color: var(--dim); }
+.bad { color: var(--bad); } .good { color: var(--ok); }
+.list { display: grid; gap: 6px; }
+.item { display: flex; gap: 8px; align-items: center; justify-content: space-between; border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 12px; font-size: 14px; }
+.item small { color: var(--dim); display: block; }
+.steps { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 8px; }
+code { font: 12px ui-monospace, monospace; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; word-break: break-all; }
+.rec { border: 1.5px solid var(--accent); border-radius: 14px; padding: 12px; }
+.rec b.big { font: 800 22px "NDoto", "NSpace", sans-serif; }

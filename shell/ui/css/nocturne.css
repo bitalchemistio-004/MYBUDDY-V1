@@ -1,0 +1,183 @@
+/* Nocturne: the app window's look (Black Glow plus Dot Matrix).
+   True black, one glowing subject (the buddy's colour, --accent), a single
+   warning colour that always means "needs you" (--alert), outlines instead of
+   glass, dotted type only at 20 px and larger. Loaded last, and only where
+   <html data-look="nocturne"> is set (the app window), so the buddy and the
+   quick panel keep their own files until they are restyled too.
+   Fonts shipped in assets/fonts (open licence, SIL OFL): Doto (dotted type) and Space Grotesk, latin subset; nothing is fetched at run time. */
+
+@font-face { font-family: "Doto"; font-weight: 100 900; font-display: swap; src: url("../assets/fonts/doto.woff2") format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-weight: 300 700; font-display: swap; src: url("../assets/fonts/spacegrotesk.woff2") format("woff2"); }
+
+html[data-look="nocturne"], html[data-look="nocturne"][data-theme] {
+  --bg: #000; --surface-1: #000; --surface-2: #0d0d0d; --surface-3: #1a1a1a;
+  --line: #2b2b2b; --line-strong: #4a4a4a;
+  --text: #f2f2ef; --text-2: #b9b9b3; --text-3: #9a9a94;
+  --radius-lg: 4px; --radius: 4px; --radius-sm: 3px;
+  --display: "Space Mono", "Cascadia Mono", Consolas, monospace;
+  --dotted: "Doto", "Space Mono", "Cascadia Mono", Consolas, monospace;
+  --font: "Space Grotesk", "Nunito", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --alert: #ff4a2e; --alert-ink: #120300;
+  --tint: transparent; --glass-fill: transparent; --glass-edge: transparent; --glass-hi: transparent; --shadow: transparent;
+}
+html[data-look="nocturne"][data-theme="clay"] {
+  --accent: #f2f2ef; --accent-hover: #ffffff; --accent-soft: rgba(255, 255, 255, .12); --accent-text: #f2f2ef; --accent-ink: #000; --focus: #ffffff;
+}
+html[data-look="nocturne"] .ambient { background: #000; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---- frame ---- */
+html[data-look="nocturne"] .app { grid-template-rows: 44px minmax(0, 1fr); }
+html[data-look="nocturne"][data-shell="web"] .app { grid-template-rows: minmax(0, 1fr); }
+html[data-look="nocturne"][data-shell="web"] .titlebar { display: none; }
+html[data-look="nocturne"] .titlebar .brand { color: var(--text-3); }
+html[data-look="nocturne"] .body { grid-template-columns: 96px minmax(0, 1fr); gap: 0; padding: 0; }
+html[data-look="nocturne"] .main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+html[data-look="nocturne"] .main > .content { flex: 1 1 auto; min-height: 0; }
+html[data-look="nocturne"] .main > .needs, html[data-look="nocturne"] .main > .askbar { flex: none; }
+html[data-look="nocturne"] .content { padding: 22px 28px 26px; }
+html[data-look="nocturne"] .view { max-width: 1180px; gap: 16px; animation: none; }
+
+/* ---- the rail ---- */
+.rail { border-right: 1px solid var(--line); padding: 12px 8px; display: flex; flex-direction: column; gap: 6px; align-items: stretch; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.rail .me { display: grid; place-items: center; padding: 4px 0 10px; }
+.rail .me .avatar { width: 64px; height: 48px; position: relative; }
+.rail .me .avatar::before { content: ""; position: absolute; inset: -14px; z-index: -1; background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 45%, transparent), transparent 72%); }
+.rail .nav { display: flex; flex-direction: column; gap: 4px; }
+.rail .nav a { position: relative; display: grid; gap: 3px; justify-items: center; padding: 9px 2px; min-height: 52px; border-radius: 8px; color: var(--text-2);
+  font: 500 12px/1.1 var(--font); text-decoration: none; background: none; }
+.rail .nav a svg { width: 22px; height: 22px; }
+.rail .nav a:hover { color: var(--text); background: none; }
+.rail .nav a[aria-current="page"] { color: var(--text); background: none; }
+.rail .nav a[aria-current="page"]::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.rail .pend { position: absolute; top: 4px; right: 14px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--alert); color: var(--alert-ink); font: 700 12px var(--display); display: grid; place-items: center; padding: 0 4px; }
+.rail .gap { flex: 1; }
+.rail .live { display: grid; place-items: center; padding: 8px 0; }
+.rail .live .chip { padding: 0; border: 0; background: none; }
+.rail .live .chip .dot { width: 10px; height: 10px; }
+
+/* ---- page title and tabs ---- */
+.ph { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.ph h2 { margin: 0; font: 800 44px/1 var(--dotted); text-transform: uppercase; letter-spacing: .01em; }
+.ph p { margin: 4px 0 0; color: var(--text-2); font-size: 14px; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
+.tabs a { border: 1.5px solid var(--line); color: var(--text-2); font: 700 12px var(--display); letter-spacing: .05em; text-transform: uppercase; padding: 0 12px; border-radius: 2px;
+  min-height: 34px; display: inline-flex; align-items: center; text-decoration: none; }
+.tabs a:hover { color: var(--text); border-color: var(--line-strong); }
+.tabs a[aria-current="page"] { color: #000; background: var(--text); border-color: var(--text); }
+.tabbody .view .top h1 { display: none; }
+.tabbody .view[data-view="home"] .top h1 { display: block; font: 800 30px/1.1 var(--dotted); }
+.tabbody .view .top { margin: 0; }
+.tabbody .view .top:empty { display: none; }
+
+/* ---- surfaces: outlines, no fill ---- */
+html[data-look="nocturne"] .surface, html[data-look="nocturne"] .lcard, html[data-look="nocturne"] .glass {
+  background: transparent; border: 1.5px solid var(--line-strong); border-radius: 4px; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-look="nocturne"] .hero { background: transparent; }
+html[data-look="nocturne"] .hero .stage, html[data-look="nocturne"] .charpick .stage, html[data-look="nocturne"] .galview .stage {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 38%, transparent), transparent 72%); }
+html[data-look="nocturne"] .lcard h3, html[data-look="nocturne"] .label { color: var(--text-2); letter-spacing: .08em; }
+html[data-look="nocturne"] .lcard .wk-pct, html[data-look="nocturne"] .lcard .wk-task { font-family: var(--dotted); }
+html[data-look="nocturne"] .lcard .wk-task { font-size: 20px; }
+html[data-look="nocturne"] .item:hover { background: var(--surface-2); }
+html[data-look="nocturne"] .ask { border-color: var(--alert); }
+html[data-look="nocturne"] .ask h3 { color: var(--alert); }
+html[data-look="nocturne"] .pcs span { background: transparent; border: 1px solid var(--line-strong); border-radius: 2px; color: var(--text-2); }
+html[data-look="nocturne"] .charpick { background: transparent; border: 1.5px solid var(--line-strong); }
+html[data-look="nocturne"] .charpick[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 40%, transparent); background: transparent; color: var(--text); }
+html[data-look="nocturne"] .galpick { background: transparent; }
+html[data-look="nocturne"] .provopt, html[data-look="nocturne"] .rolefrm { background: transparent; border: 1px solid var(--line-strong); }
+
+/* ---- controls ---- */
+html[data-look="nocturne"] .btn { border-radius: 99px; border: 1.5px solid var(--line-strong); background: transparent; color: var(--text); }
+html[data-look="nocturne"] .btn:hover { background: var(--surface-3); border-color: var(--text-2); }
+html[data-look="nocturne"] .btn.accent { background: var(--text); border-color: var(--text); color: #000; }
+html[data-look="nocturne"] .btn.accent:hover { background: #fff; }
+html[data-look="nocturne"] .btn.danger { color: var(--alert); border-color: var(--alert); }
+html[data-look="nocturne"] .btn.danger:hover { background: rgba(255, 74, 46, .14); }
+html[data-look="nocturne"] .btn.ghost { border-color: transparent; color: var(--text-2); }
+html[data-look="nocturne"] .field { background: #000; border: 1.5px solid var(--line-strong); border-radius: 4px; }
+html[data-look="nocturne"] .field:focus { border-color: var(--accent); box-shadow: none; }
+html[data-look="nocturne"] .seg { background: transparent; border: 1.5px solid var(--line-strong); border-radius: 99px; }
+html[data-look="nocturne"] .seg button[aria-pressed="true"] { background: var(--text); color: #000; }
+html[data-look="nocturne"] .switch { background: #000; border: 1.5px solid var(--line-strong); }
+html[data-look="nocturne"] .switch::after { background: var(--text-2); box-shadow: none; }
+html[data-look="nocturne"] .switch[aria-checked="true"] { background: #000; border-color: var(--accent); }
+html[data-look="nocturne"] .switch[aria-checked="true"]::after { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+html[data-look="nocturne"] .chip { border-radius: 2px; background: transparent; border: 1px solid var(--line-strong); font-family: var(--display); font-weight: 700; }
+html[data-look="nocturne"] .chip.on { background: transparent; color: var(--accent-text); border-color: var(--accent); }
+html[data-look="nocturne"] .chip.ok { background: transparent; color: var(--ok); border: 1px solid var(--ok); }
+html[data-look="nocturne"] .toast { background: var(--text); color: #000; border: 0; border-radius: 99px; }
+html[data-look="nocturne"] .toast button { color: #000; text-decoration: underline; }
+html[data-look="nocturne"] .progress { background: #1a1a1a; }
+
+/* ---- the needs-you strip and the ask bar ---- */
+.needs { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 26px; border-bottom: 1.5px solid var(--alert); background: #000; }
+.needs .tagline { font: 700 12px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--alert); }
+.needs b { flex: 1; min-width: 200px; font-weight: 600; }
+.needs .btn.accent { background: var(--alert); border-color: var(--alert); color: var(--alert-ink); }
+.askbar { border-top: 1px solid var(--line); padding: 10px 26px 12px; display: grid; gap: 8px; background: #000; }
+.askrow { display: flex; gap: 8px; align-items: center; }
+.askrow .field { flex: 1; min-width: 0; }
+.askreply { border: 1.5px solid var(--line-strong); border-radius: 4px; padding: 10px 14px; display: grid; gap: 4px; max-height: 160px; overflow: auto; }
+.askreply p { margin: 0; }
+.askreply .you { color: var(--text-2); font-size: 13px; }
+.askreply .via { font: 700 12px var(--display); color: var(--text-2); letter-spacing: .03em; }
+body[data-space="now"][data-tab="live"] .askbar, body[data-space="now"][data-tab="live"] .needs { display: none; }
+body.in-setup .askbar, body.in-setup .needs { display: none; }
+
+/* ---- a narrow window (the phone): the rail becomes a bottom bar ---- */
+@media (max-width: 760px) {
+  html[data-look="nocturne"] .body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  html[data-look="nocturne"] .main { order: 1; }
+  .rail { order: 2; flex-direction: row; border-right: 0; border-top: 1px solid var(--line); padding: 4px; gap: 0; overflow: hidden; }
+  .rail .me, .rail .gap, .rail .live { display: none; }
+  .rail .nav { flex-direction: row; flex: 1; gap: 0; }
+  .rail .nav a { flex: 1; min-height: 56px; }
+  .rail .nav a[aria-current="page"]::before { left: 18%; right: 18%; top: 0; bottom: auto; width: auto; height: 3px; }
+  .rail .pend { right: 22%; }
+  html[data-look="nocturne"] .content { padding: 14px 14px 12px; }
+  .ph h2 { font-size: 34px; }
+  .askbar, .needs { padding-left: 14px; padding-right: 14px; }
+  html[data-look="nocturne"] .btn, html[data-look="nocturne"] .field, .tabs a { min-height: 44px; }
+}
+
+/* ---- readable minimums (checked live: nothing under 12 px text; targets 32 px, 44 px on a phone) ---- */
+html[data-look="nocturne"] .galpick em, html[data-look="nocturne"] .provopt small, html[data-look="nocturne"] .tier,
+html[data-look="nocturne"] .pcs span, html[data-look="nocturne"] .lcard .pipe span, html[data-look="nocturne"] .lcard .tt,
+html[data-look="nocturne"] .lcard .cal .d, html[data-look="nocturne"] .sec .tlh, html[data-look="nocturne"] .sec .histl,
+html[data-look="nocturne"] .sec .metas .chip, html[data-look="nocturne"] .sec .cal .dow, html[data-look="nocturne"] .sec .cal button.day .cnt,
+html[data-look="nocturne"] .chip, html[data-look="nocturne"] .nav .new { font-size: 12px; }
+html[data-look="nocturne"] .switch { width: 56px; height: 36px; position: relative; }
+html[data-look="nocturne"] .switch::after { top: 7px; left: 7px; width: 20px; height: 20px; }
+html[data-look="nocturne"] .switch[aria-checked="true"]::after { transform: translateX(20px); }
+@media (max-width: 760px) { html[data-look="nocturne"] .switch { height: 44px; width: 64px; } html[data-look="nocturne"] .switch::after { top: 11px; } }
+
+/* dot meters and big words, used by the new screens */
+.dotrow { display: flex; gap: 4px; flex-wrap: wrap; }
+.dotrow i { width: 9px; height: 9px; border-radius: 50%; background: #2a2a2a; display: block; }
+.dotrow i.on { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.mid { font: 800 26px/1.1 var(--dotted); }
+.big { font: 800 44px/1 var(--dotted); }
+.lcard code { font-family: var(--display); font-size: 12px; border: 1px solid var(--line-strong); padding: 1px 6px; border-radius: 2px; }
+
+/* ---- where I'm working, pairing, and the phone ---- */
+.where { margin-left: auto; align-self: flex-end; }
+.where button { min-height: 34px; }
+html[data-remote] .pc-only { display: none; }
+.pairing { max-width: 520px; margin: 0 auto; padding-top: 8vh; }
+.pairtitle { margin: 0; font: 800 36px/1.1 var(--dotted); text-transform: uppercase; }
+.paircode { border: 1.5px solid var(--accent); border-radius: 4px; padding: 14px 16px; display: grid; gap: 4px; }
+.paircode .big { letter-spacing: .18em; }
+@media (max-width: 760px) { .where { margin-left: 0; width: 100%; } .where button { flex: 1; min-height: 44px; } }
+
+html[data-look="nocturne"] .empty { display: grid; gap: 6px; justify-items: center; }
+html[data-look="nocturne"] .askreply[hidden] + .askrow #ask-close { display: none; }
+
+/* ---- usage bars, the brain panel's warnings ---- */
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 120px; border-bottom: 1.5px solid var(--line-strong); }
+.bars .bar { flex: 1; min-width: 3px; height: 100%; display: flex; align-items: flex-end; }
+.bars .bar i { display: block; width: 100%; background: var(--accent); border-radius: 2px 2px 0 0; box-shadow: 0 0 8px var(--accent); }
+details.warn { border: 1.5px solid var(--line-strong); border-radius: 4px; padding: 10px 12px; }
+details.warn summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; }
+details.warn .list { margin-top: 8px; }
