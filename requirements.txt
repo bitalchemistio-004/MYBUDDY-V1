@@ -36,7 +36,7 @@ webrtcvad-wheels==2.0.14   # WebRTC VAD — pre-compiled, no C++ toolchain neede
 scipy>=1.9                 # IIR high-pass filter (butter + lfilter)
 
 # Content Awareness [v5.0.0-SENTIENCE]
-mss>=9.0.1                 # Screen capture (cross-platform)
+mss>=10.2.0                 # Screen capture (cross-platform)
 Pillow>=10.0.0             # Image processing
 anthropic>=0.18.0          # Claude Vision API (optional)
 google-genai>=0.1.0        # Gemini Vision API (uses the already-configured GEMINI_API_KEY)
