@@ -77,7 +77,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.webkit:webkit:1.12.1")                       // WebViewAssetLoader: the bundled page gets a real https origin
     implementation("androidx.work:work-runtime-ktx:2.10.0")              // the background check for what MBUDDY put on the phone
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")    // the pairing token, encrypted on the phone
+    implementation("androidx.security:security-crypto:1.1.0")    // the pairing token, encrypted on the phone
     implementation("com.google.ai.edge.litertlm:litertlm-android:0.18.0") // Google's on-device runtime: the model that runs on the phone itself
     implementation("com.alphacephei:vosk-android:0.3.75")                // offline speech recognition: it listens for "hey buddy" with no internet
     testImplementation("junit:junit:4.13.2")                              // the local unit tests (app/src/test): the rules that must not regress
