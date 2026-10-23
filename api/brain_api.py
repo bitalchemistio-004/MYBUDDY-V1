@@ -3,7 +3,8 @@ api/brain_api.py - the brain (brain/brain_store.py) for the app: status, link,
 notes, learn, delete. Local-only, like the rest of the app's API.
 
   GET    /brain/status          {"linked", "vault", "folder", "notes", "obsidian_installed", "learning"}
-  POST   /brain/link            {"vault": optional path}  (default: the vault Obsidian has open)
+  POST   /brain/link            {"vault": optional path, "create": optional bool}  (default: the vault Obsidian has open;
+                                 create: a new "MBUDDY Vault" folder in Documents)
   POST   /brain/unlink
   GET    /brain/notes           {"notes": [{"title", "kind", "status", "strength", "uses", "source", "path"}]}
   POST   /brain/learn           {"topic": str, "kind": "topic" | "app"}  (the "Learn" button, S94)
@@ -42,7 +43,7 @@ async def link_handler(request: web.Request) -> web.Response:
     _require_local(request)
     data = await _body(request)
     try:
-        return _json(await asyncio.to_thread(brain_store.link, str(data.get("vault") or "")))
+        return _json(await asyncio.to_thread(brain_store.link, str(data.get("vault") or ""), bool(data.get("create"))))
     except ValueError as exc:
         return _json({"ok": False, "error": str(exc)}, 400)
 

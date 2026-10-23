@@ -86,3 +86,4 @@ Step "Check"
 & $venv check_system.py
 Write-Host "`nDone. Start the brain with:  .venv\Scripts\python.exe main.py   (or run.bat)" -ForegroundColor Green
 Write-Host "Then set your name in the app's Settings. Nobody's name is built in." -ForegroundColor Green
+Write-Host "Optional: let MBUDDY learn in Settings, General, Learning memory (your Obsidian vault or a new one)." -ForegroundColor Green

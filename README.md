@@ -155,7 +155,7 @@ brain.
 
 **PC, one command:** `git clone https://github.com/bitalchemistio-004/MYBUDDY-V1.git`, then `cd MYBUDDY-V1` and `setup.bat`.
 Download sizes, disk space and every step, part by part: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
-To let MBUDDY learn (lessons and skills), also open a vault in [Obsidian](https://obsidian.md): it is optional, and found automatically ([how it works](docs/GETTING_STARTED.md#learning-memory-obsidian-optional)).
+To let MBUDDY learn (lessons and skills), link a vault in Settings, General ([Obsidian](https://obsidian.md) or any folder): it is optional ([how it works](docs/GETTING_STARTED.md#learning-memory-obsidian-optional)).
 
 **The phone app** (JDK 17 and the Android SDK; the Gradle wrapper is included):
 ```bash

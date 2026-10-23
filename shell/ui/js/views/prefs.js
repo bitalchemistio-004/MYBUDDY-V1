@@ -7,6 +7,7 @@ import { CAST, CAST_INFO, castFor, clipsUrl, thumbsUrl, createSpriteBuddy, reduc
 import { esc, header, switchRow, segRow, wireSettings } from "./ui.js";
 import { rolesCard } from "./roles-card.js";
 import { mountWardrobe } from "./wardrobe-card.js";
+import { mountVaultCard } from "./vault-card.js";
 
 
 // The tool permissions (core/ui_settings.py TOOL_NAMES), as Extensions shows them.
@@ -650,7 +651,9 @@ export const settings = {
           <select class="field" id="s-model" data-key="llm_model" style="max-width:260px">${models.map((m) => `<option ${m === s.llm_model ? "selected" : ""}>${esc(m)}</option>`).join("")}</select></div>
         <div class="setting"><div><div class="t">Home location</div><div class="s">Used for weather when you don't name a place.</div></div>
           <input class="field" id="s-home" data-key="home_location" style="max-width:260px" maxlength="120" placeholder="e.g. London" value="${esc(s.home_location)}"></div>
-      </div>`;
+      </div>
+      <div id="s-vault"></div>`;
+    mountVaultCard(el.querySelector("#s-vault"), ctx);
     wireText(el.querySelector("#s-name"), ctx, (ok, f) => ok && ctx.toast(`I'll call you ${f.value}.`));
     // "Thinks to itself" is the backend's existing companion setting, not an app setting.
     const inner = el.querySelector('[data-switch="inner_thoughts"]');

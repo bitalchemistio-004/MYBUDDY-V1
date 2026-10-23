@@ -124,11 +124,22 @@ def get_vault() -> Vault | None:
         return _vault
 
 
-def link(vault: str | None = None) -> dict:
-    """Link a vault (default: the one Obsidian has open). Raises ValueError."""
-    path = (vault or "").strip() or detect_obsidian_vault()
-    if not path or not Path(path).is_dir():
-        raise ValueError("no Obsidian vault folder was found; open a vault in Obsidian first")
+NEW_VAULT_NAME = "MBUDDY Vault"
+
+
+def link(vault: str | None = None, create: bool = False) -> dict:
+    """Link a vault: the folder given, a new one in Documents (create), or the one Obsidian has open. Raises ValueError."""
+    if create:
+        from brain import pc_actions
+        new = pc_actions._base_dir().parent / NEW_VAULT_NAME     # the real Documents folder, even under OneDrive
+        new.mkdir(parents=True, exist_ok=True)
+        path = str(new)
+    else:
+        path = (vault or "").strip().strip('"') or detect_obsidian_vault()
+    if not path:
+        raise ValueError("no Obsidian vault was found: open one in Obsidian, choose a folder, or create a new vault")
+    if not Path(path).is_dir():
+        raise ValueError(f"that folder doesn't exist: {path}")
     _write_link({"vault": str(Path(path)), "linked_at": datetime.now().isoformat(timespec="seconds")})
     get_vault()
     return status()
@@ -142,7 +153,8 @@ def unlink() -> dict:
 def status() -> dict:
     root = vault_root()
     vault = get_vault() if root else None
-    return {"linked": vault is not None, "vault": str(root) if root else None,
+    return {"ok": True, "linked": vault is not None, "vault": str(root) if root else None,
+            "detected": None if vault else detect_obsidian_vault(),   # what "Use my Obsidian vault" would link
             "folder": str(vault.base) if vault else None, "notes": len(list_notes()) if vault else 0,
             "obsidian_installed": obsidian_installed(), "learning": sorted(_learning),
             "library": _library_size() if vault else {"topics": 0, "pages": 0, "chars": 0}}

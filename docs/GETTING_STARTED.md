@@ -55,7 +55,7 @@ install (without the 2.4 GB of CUDA packages) isn't set up yet; help with that i
    what is still missing, without changing anything.
 6. **The window** (optional): `cd shell`, `npm install`, `npm run dev`.
 7. **Your name**: type it in the app (Settings). Nobody's name is built in; until you set one, MBUDDY says "the user".
-8. **Learning memory** (optional): open a vault in Obsidian so MBUDDY can learn; see [Learning memory](#learning-memory-obsidian-optional) below.
+8. **Learning memory** (optional): in the app, Settings, General, Learning memory; see [Learning memory](#learning-memory-obsidian-optional) below.
 
 ## Learning memory (Obsidian, optional)
 
@@ -65,13 +65,12 @@ database, and don't need a vault.
 
 - **Optional, but recommended.** Without a vault everything else works (chat, voice, reminders, focus, music, apps),
   but MBUDDY doesn't learn and the Brain page's "What I learned" stays empty.
-- **Connecting it:** install Obsidian (free) and open or create a vault. MBUDDY finds the vault Obsidian has open by
-  itself, and writes its notes in an `MBUDDY` folder inside it. Open that folder in Obsidian to read, edit or delete
-  what it learned; MBUDDY respects your edits.
-- **Without the Obsidian app:** a vault is just a folder of Markdown files. To use any folder, link it through the
-  local server: `POST http://127.0.0.1:5000/brain/link` with `{"vault": "C:\\path\\to\\folder"}`.
-- **Known gap:** the Brain page says "Link one in Settings", but there is no Settings control for this yet. A Link /
-  Unlink control in Settings (and a step in `setup.bat`) is planned; help is welcome.
+- **Connecting it:** in the app, **Settings, General, Learning memory** (or **Brain, Learned** while nothing is
+  linked). Choose **Use my Obsidian vault** (the vault Obsidian has open, found by itself), **Create a new vault**
+  (a folder called "MBUDDY Vault" in Documents), or type the path of any folder. MBUDDY writes its notes in an `MBUDDY`
+  folder inside it. **Unlink** stops learning and leaves the notes where they are.
+- **Obsidian itself is optional:** a vault is just a folder of Markdown files. Install Obsidian (free) to read, edit or
+  delete what MBUDDY learned; it respects your edits.
 - **Privacy:** the vault stays on your PC and outside git. Tests never write to it.
 
 ## Before you open a pull request

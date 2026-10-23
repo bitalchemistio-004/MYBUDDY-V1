@@ -134,3 +134,18 @@ def test_the_folder_readme_is_not_a_note(vault):
     assert (v.base / "About this folder.md").is_file()
     assert bs.list_notes() == [] and bs.status()["notes"] == 0
     assert bs.recall("what does MBUDDY keep in this folder") == ("", [])
+
+
+def test_the_learning_memory_can_be_linked_from_the_app(vault, monkeypatch, tmp_path):
+    # the Brain page pointed at a Settings control that didn't exist; these are what the new card calls
+    from brain import pc_actions
+    monkeypatch.setattr(pc_actions, "BASE_DIR", tmp_path / "Documents" / "MBUDDY")
+    bs.unlink()
+    off = bs.status()
+    assert not off["linked"] and off["detected"] == str(tmp_path / "Obsidian Vault")     # "Use my Obsidian vault"
+    made = bs.link(create=True)                                                          # "Create a new vault"
+    assert made["linked"] and made["vault"] == str(tmp_path / "Documents" / "MBUDDY Vault")
+    assert (tmp_path / "Documents" / "MBUDDY Vault" / "MBUDDY").is_dir() and made["detected"] is None
+    with pytest.raises(ValueError, match="doesn't exist"):
+        bs.link(str(tmp_path / "nowhere"))                                               # "Use this folder", mistyped
+    assert bs.link(str(tmp_path / "Obsidian Vault"))["vault"] == str(tmp_path / "Obsidian Vault")

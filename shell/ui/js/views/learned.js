@@ -2,6 +2,7 @@
 // vault with the evidence the brain itself keeps (api/learned_api.py).
 import { api } from "../api.js";
 import { esc, header } from "./ui.js";
+import { mountVaultCard } from "./vault-card.js";
 
 const GROUPS = [["all", "Everything"], ["lessons", "Lessons"], ["skills", "Skills"], ["about you", "About you"], ["facts", "Facts"], ["apps", "Apps"]];
 const MODE_LABEL = { off: "Brain off", memory: "Memory", lessons: "+ Lessons", skills: "+ Skills", full: "Full loop" };
@@ -27,7 +28,9 @@ export const learned = {
 
     const draw = () => {
       if (!data.linked) {
-        body.innerHTML = `<div class="surface card"><div class="empty">My notes aren't linked to an Obsidian vault yet. Link one in Settings, and what I learn will show up here.</div></div>`;
+        // not linked: the real control, here (it used to point at a Settings option that didn't exist)
+        body.innerHTML = `<div id="ln-vault"></div>`;
+        mountVaultCard(body.querySelector("#ln-vault"), ctx, (st) => { if (st.linked) learned.render(el, ctx); });
         return;
       }
       const items = data.items.filter((it) => group === "all" || it.group === group);

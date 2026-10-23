@@ -14,8 +14,8 @@ setup.bat
 `setup.bat` makes the Python environment, installs the packages, creates `.env`, downloads the voice files, pulls the local
 AI model when [Ollama](https://ollama.com) is installed, and checks the result. It is safe to run again. Options:
 `-Cpu` (no NVIDIA GPU), `-SkipModel` (skip the 2.5 GB model), `-WithApp` (also the desktop window; needs Node and Rust).
-Then run `run.bat` and set your name in the app's Settings. Optional: open a vault in [Obsidian](https://obsidian.md) so MBUDDY
-can learn (see [Learning memory](docs/GETTING_STARTED.md#learning-memory-obsidian-optional)).
+Then run `run.bat` and set your name in the app's Settings. Optional: link a learning vault in Settings, General
+([Obsidian](https://obsidian.md) or any folder) so MBUDDY can learn (see [Learning memory](docs/GETTING_STARTED.md#learning-memory-obsidian-optional)).
 
 Sizes, requirements and manual steps for every part are in [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md). Working only
 on the pages? You need nothing but Node: `node --test shell/ui/tests/*.test.mjs`.
